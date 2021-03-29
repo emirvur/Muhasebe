@@ -1,4 +1,5 @@
 import 'package:Muhasebe/models/dtofattahs.dart';
+import 'package:Muhasebe/models/dtokasahars.dart';
 import 'package:Muhasebe/models/dtotahsharfat.dart';
 import 'package:Muhasebe/models/dtourungecmisi.dart';
 import 'package:Muhasebe/models/dtourunhareket.dart';
@@ -9,17 +10,17 @@ import 'package:Muhasebe/services/apiservices.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
-class SatisfatDetailui extends StatefulWidget {
-  final Dtofattahs dt;
-  SatisfatDetailui(this.dt);
+class Kasaharui extends StatefulWidget {
+  final Kasa dt;
+  Kasaharui(this.dt);
   @override
-  _SatisfatDetailuiState createState() => _SatisfatDetailuiState();
+  _KasaharuiState createState() => _KasaharuiState();
 }
 
-class _SatisfatDetailuiState extends State<SatisfatDetailui> {
+class _KasaharuiState extends State<Kasaharui> {
   final _formKey = GlobalKey<FormState>();
-  List<Dtourunhareket> lis = [];
-  List<Dtotahsharfat> ltah = [];
+  List<Dtokasahar> lis = [];
+  // List<Dtotahsharfat> ltah = [];
   bool _isloading = true;
   bool tahsilform = false;
   DateTime selectedDate = DateTime.now();
@@ -37,12 +38,12 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
     contar = TextEditingController();
     conacik = TextEditingController();
     condeg = TextEditingController();
-    APIServices.tahsharfaticin(widget.dt.tahsid).then((value) => ltah = value);
+
     APIServices.kasalistal().then((value) {
       kasalist = value;
       kas = kasalist[0];
     });
-    APIServices.fatuurundetay(widget.dt.fatid).then((value) {
+    APIServices.kasahar(widget.dt.kasaid).then((value) {
       Future.delayed(Duration(seconds: 2), () {
         setState(() {
           lis = value;
@@ -145,7 +146,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                       child: Row(
                         children: [
                           Text(
-                            "Satış Faturaları > Satış Faturaları",
+                            "Kasa ve Bankalar > Kasa Hesabı",
                             style: TextStyle(
                                 fontSize: 24.0, fontWeight: FontWeight.bold),
                           ),
@@ -179,7 +180,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                     Row(
                                       children: [
                                         Icon(Icons.text_format),
-                                        Text(widget.dt.fataciklama),
+                                        Text(widget.dt.kasaAd),
                                         Spacer(),
                                         Container(
                                           height: 45,
@@ -194,15 +195,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                       ],
                                     ),
                                     Divider(),
-                                    Container(
-                                      child: Chip(
-                                        label: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(widget.dt.katad)),
-                                      ),
-                                    ),
-                                    Divider(),
-                                    Row(
+                                    /*    Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
@@ -213,14 +206,14 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                         Text("ff")
                                       ],
                                     ),
-                                    Divider(),
+                                    Divider(),*/
                                     Container(
                                         width: wsize,
                                         child: DataTable(
                                             columns: const <DataColumn>[
                                               DataColumn(
                                                 label: Text(
-                                                  'Ürün',
+                                                  'İşlem Türü',
                                                   style: TextStyle(
                                                       fontStyle:
                                                           FontStyle.italic),
@@ -228,7 +221,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                               ),
                                               DataColumn(
                                                 label: Text(
-                                                  ' Miktarı',
+                                                  'İşlem  Tarihi',
                                                   style: TextStyle(
                                                       fontStyle:
                                                           FontStyle.italic),
@@ -236,7 +229,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                               ),
                                               DataColumn(
                                                 label: Text(
-                                                  'Br. Fiyat',
+                                                  'İlgili Hesap',
                                                   style: TextStyle(
                                                       fontStyle:
                                                           FontStyle.italic),
@@ -244,7 +237,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                               ),
                                               DataColumn(
                                                 label: Text(
-                                                  'Vergi',
+                                                  'Açıklama',
                                                   style: TextStyle(
                                                       fontStyle:
                                                           FontStyle.italic),
@@ -252,7 +245,15 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                               ),
                                               DataColumn(
                                                 label: Text(
-                                                  'Toplam',
+                                                  'Meblağ',
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic),
+                                                ),
+                                              ),
+                                              DataColumn(
+                                                label: Text(
+                                                  'Bakiye',
                                                   style: TextStyle(
                                                       fontStyle:
                                                           FontStyle.italic),
@@ -261,120 +262,58 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                             ],
                                             rows: lis
                                                 .map((e) => DataRow(cells: [
-                                                      DataCell(Text(e.ad)),
                                                       DataCell(Text(
-                                                        e.miktar.toString(),
+                                                          e.durum.toString())),
+                                                      DataCell(Text(
+                                                        e.durum == 0
+                                                            ? e.tediltar
+                                                                .toString()
+                                                            : e.durum == 1
+                                                                ? e.odenmistar
+                                                                : "",
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight
                                                                     .bold),
                                                       )),
                                                       DataCell(Text(
-                                                        e.brfiyat.toString(),
+                                                        "",
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight
                                                                     .bold),
                                                       )),
                                                       DataCell(Text(
-                                                        e.vergi.toString(),
+                                                        e.durum == 0
+                                                            ? e.tahsaciklama
+                                                                .toString()
+                                                            : e.durum == 1
+                                                                ? e.odaciklama
+                                                                : e.miktaraciklamasi,
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight
                                                                     .bold),
                                                       )),
-                                                      DataCell(Text("---")),
+                                                      DataCell(
+                                                        Text(e.durum == 0
+                                                            ? e.alinmismik
+                                                                .toString()
+                                                            : e.durum == 1
+                                                                ? e.odendimik
+                                                                : e.miktar
+                                                                    .toString()),
+                                                      ),
+                                                      DataCell(Text(e.netbakiye
+                                                          .toString())),
                                                     ]))
                                                 .toList())),
                                     Divider(),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          width: (2 * wsize) / 6,
-                                          height: 120,
-                                          color: Colors.white,
-                                        ),
-                                        Container(
-                                          width: (2 * wsize) / 6,
-                                          height: 120,
-                                          //     color: Colors.green,
-                                          child: Column(
-                                            children: [
-                                              Divider(),
-                                              Row(
-                                                children: [
-                                                  Text("Ara Toplam"),
-                                                  Spacer(),
-                                                  Text(widget.dt.aratop
-                                                      .toString())
-                                                ],
-                                              ),
-                                              Divider(),
-                                              Row(
-                                                children: [
-                                                  Text("Toplam Kdv "),
-                                                  Spacer(),
-                                                  Text(widget.dt.kdv.toString())
-                                                ],
-                                              ),
-                                              Divider(),
-                                              Row(
-                                                children: [
-                                                  Text("Genel Toplam"),
-                                                  Spacer(),
-                                                  Text(widget.dt.geneltoplam
-                                                      .toString())
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    )
                                   ],
                                 ),
                                 color: Colors.white,
                               ),
                             ),
-                            /*   Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(widget.dt.duztarih.toString()),
-                                Row(children: [
-                                  Icon(Icons.calendar_today),
-                                  Text("Kasa Hesabı")
-                                ]),
-                                Text(
-                                    "Müşteriden Tahsilat   ${widget.dt.alinmism} TL")
-                              ],
-                            ),*/
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: ltah.length,
-                              itemBuilder: (context, index) {
-                                return Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(ltah[index].tediltar),
-                                    Row(children: [
-                                      Icon(Icons.calendar_today),
-                                      Text(ltah[index].ad),
-                                    ]),
-                                    Text(
-                                        "Müşteriden Tahsilat   ${ltah[index].alinmismik} TL")
-                                  ],
-                                );
-                              },
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                  "Kalan    ${widget.dt.geneltoplam - widget.dt.alinmism}TL"),
-                            )
                           ],
                         ),
                       ),
@@ -406,7 +345,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                   ),
                                 ],
                               ),
-                              Container(
+                              /*  Container(
                                 width: wsize / 5,
                                 decoration: BoxDecoration(
                                   color: Colors.green,
@@ -624,7 +563,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                           ),
                                   ],
                                 ),
-                              ),
+                              ),*/
                               SizedBox(
                                 height: 10,
                               ),

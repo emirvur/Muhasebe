@@ -7,12 +7,14 @@ class AddProdForm extends StatefulWidget {
 
 class _AddProdFormState extends State<AddProdForm> {
   final _formKey = GlobalKey<FormState>();
+  String dropstr = "Adet";
+  String strkd = "%18";
   @override
   Widget build(BuildContext context) {
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
-          backgroundColor: Colors.grey.shade200,
+          backgroundColor: Colors.grey.shade300,
           body: Row(
             children: [
               Expanded(
@@ -20,25 +22,37 @@ class _AddProdFormState extends State<AddProdForm> {
                   child: Expanded(
                     child: Column(children: [
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: Row(
                           children: [
-                            Text(
-                              "Hizmet ve Ürünler > Yeni",
-                              style: TextStyle(
-                                  fontSize: 24.0, fontWeight: FontWeight.bold),
+                            RichText(
+                              text: TextSpan(
+                                text: "Hizmet ve Ürünler >",
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 24),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: "Yeni",
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 24)
+                                      //       fontWeight:
+                                      //              FontWeight.w300)
+                                      ),
+                                ],
+                              ),
                             ),
 
                             //   SizedBox(
                             //       width: 13,  ),
                             Spacer(),
                             Padding(
-                              padding: const EdgeInsets.only(right: 24.0),
+                              padding: const EdgeInsets.only(right: 8.0),
                               child: Text(
                                 "Ahmet Seç",
                                 style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.bold),
+                                  fontSize: 24.0,
+                                  //      fontWeight: FontWeight.bold
+                                ),
                               ),
                             ),
                           ],
@@ -47,7 +61,10 @@ class _AddProdFormState extends State<AddProdForm> {
                       Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
-                              color: Colors.white,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8)),
+                              //  color: Colors.white,
                               child: Column(children: [
                                 Form(
                                   key: _formKey,
@@ -68,7 +85,15 @@ class _AddProdFormState extends State<AddProdForm> {
                                                             .bar_chart_outlined)),
                                                     Expanded(
                                                         flex: 1,
-                                                        child: Text("Adı")),
+                                                        child: Text(
+                                                          "Adı",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
                                                   ],
                                                 ))),
                                             Expanded(
@@ -88,11 +113,91 @@ class _AddProdFormState extends State<AddProdForm> {
                                             Row(
                                               children: [
                                                 Container(
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4),
+                                                      border: Border.all(
+                                                          color: Colors.black)),
                                                   height: 45,
                                                   margin: EdgeInsets.all(20),
                                                   child: FlatButton(
                                                     child: Text('Vazgeç'),
-                                                    color: Colors.grey,
+                                                    color: Colors.white,
+                                                    textColor: Colors.black,
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text('Kaydet'),
+                                                    color: Colors.grey.shade700,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Divider(height: 20, color: Colors.black),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Barkod Numarası",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                height: 45,
+                                                //   width: 45,
+                                                child: TextFormField(
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                  validator: (value) {
+                                                    // validation logic
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
                                                     textColor: Colors.white,
                                                     onPressed: () {},
                                                   ),
@@ -101,10 +206,151 @@ class _AddProdFormState extends State<AddProdForm> {
                                                   height: 45,
                                                   margin: EdgeInsets.all(20),
                                                   child: FlatButton(
-                                                    child: Text('Kaydet'),
-                                                    color: Colors.blueAccent,
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Kategorisi",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                                flex: 1,
+                                                child: Chip(
+                                                  label: Align(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      child:
+                                                          Text("Kategorisiz")),
+                                                )),
+                                            Expanded(flex: 3, child: Text("")),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
                                                     textColor: Colors.white,
                                                     onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Alış/Satış Birimi",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                                flex: 4,
+                                                child: DropdownButton<String>(
+                                                  value: dropstr,
+                                                  items: <String>[
+                                                    'Adet',
+                                                    'Kilogram',
+                                                    'Litre',
+                                                  ].map((String value) {
+                                                    return DropdownMenuItem<
+                                                        String>(
+                                                      value: value,
+                                                      child: Text(value),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (v) {
+                                                    dropstr = v;
+                                                  },
+                                                )),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
                                                   ),
                                                 ),
                                               ],
@@ -130,26 +376,88 @@ class _AddProdFormState extends State<AddProdForm> {
                                                             .bar_chart_outlined)),
                                                     Expanded(
                                                         flex: 1,
-                                                        child: Text("Adı")),
+                                                        child: Text(
+                                                          "Stok Takibi",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
                                                   ],
                                                 ))),
                                             Expanded(
-                                              flex: 4,
+                                              flex: 2,
                                               child: Container(
-                                                height: 45,
-                                                //   width: 45,
-                                                child: TextFormField(
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder()),
-                                                  validator: (value) {
-                                                    // validation logic
-                                                  },
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  //     height: ,
+                                                  child: CheckboxListTile(
+                                                    controlAffinity:
+                                                        ListTileControlAffinity
+                                                            .leading,
+                                                    title: Text('YAPILSIN'),
+                                                    value: true,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        //     _checkboxListTile = !_checkboxListTile;
+                                                      });
+                                                    },
+                                                  )),
+                                            ),
+                                            Expanded(
+                                              flex: 2,
+                                              child: Container(
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  //   height: ,
+                                                  child: CheckboxListTile(
+                                                    controlAffinity:
+                                                        ListTileControlAffinity
+                                                            .leading,
+                                                    title: Text('YAPILMASIN'),
+                                                    value: false,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        //     _checkboxListTile = !_checkboxListTile;
+                                                      });
+                                                    },
+                                                  )),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
                                                 ),
-                                              ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
+                                      ),
+                                      Divider(
+                                        height: 20,
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
@@ -166,7 +474,15 @@ class _AddProdFormState extends State<AddProdForm> {
                                                             .bar_chart_outlined)),
                                                     Expanded(
                                                         flex: 1,
-                                                        child: Text("Adı")),
+                                                        child: Text(
+                                                          "Başlangıç Stok Miktarı",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
                                                   ],
                                                 ))),
                                             Expanded(
@@ -174,6 +490,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                               child: Container(
                                                 height: 45,
                                                 child: TextFormField(
+                                                  initialValue: "0,0",
                                                   decoration: const InputDecoration(
                                                       border:
                                                           OutlineInputBorder()),
@@ -183,36 +500,32 @@ class _AddProdFormState extends State<AddProdForm> {
                                                 ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text("Adı")),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                                flex: 4,
-                                                child: Chip(
-                                                  label: Align(
-                                                      alignment:
-                                                          Alignment.centerLeft,
-                                                      child:
-                                                          Text("Kategorisiz")),
-                                                )),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -232,48 +545,14 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                            "Alış/Satış Birimi")),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                                flex: 4,
-                                                child: DropdownButton<String>(
-                                                  items: <String>[
-                                                    'Adet',
-                                                    'Kilogram',
-                                                    'Litre',
-                                                  ].map((String value) {
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value:
-                                                          "11", // selectedvalue
-                                                      child: Text(value),
-                                                    );
-                                                  }).toList(),
-                                                  onChanged: (_) {},
-                                                )),
-                                          ],
-                                        ),
-                                      ),
-                                      Divider(
-                                        height: 20,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text("Adı")),
+                                                          "Kritik Stok Uyarısı",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
                                                   ],
                                                 ))),
                                             Expanded(
@@ -287,8 +566,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     controlAffinity:
                                                         ListTileControlAffinity
                                                             .leading,
-                                                    title:
-                                                        Text('I am true now'),
+                                                    title: Text('Etkinleştir'),
                                                     value: true,
                                                     onChanged: (value) {
                                                       setState(() {
@@ -297,106 +575,31 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     },
                                                   )),
                                             ),
-                                            Expanded(
-                                              flex: 4,
-                                              child: Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Colors.black)),
-                                                  //   height: ,
-                                                  child: CheckboxListTile(
-                                                    controlAffinity:
-                                                        ListTileControlAffinity
-                                                            .leading,
-                                                    title:
-                                                        Text('I am false now'),
-                                                    value: false,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        //     _checkboxListTile = !_checkboxListTile;
-                                                      });
-                                                    },
-                                                  )),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Divider(
-                                        height: 20,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text("Adı")),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                              flex: 4,
-                                              child: Container(
-                                                height: 45,
-                                                child: TextFormField(
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder()),
-                                                  validator: (value) {
-                                                    // validation logic
-                                                  },
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text("Adı")),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                              flex: 4,
-                                              child: Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Colors.black)),
-                                                  //     height: ,
-                                                  child: CheckboxListTile(
-                                                    controlAffinity:
-                                                        ListTileControlAffinity
-                                                            .leading,
-                                                    title:
-                                                        Text('I am true now'),
-                                                    value: true,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        //     _checkboxListTile = !_checkboxListTile;
-                                                      });
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
                                                     },
-                                                  )),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
@@ -405,6 +608,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
                                           children: [
+                                            //        Expanded(  flex: 1,child: Icon(Icons.bar_chart_outlined)),
                                             Expanded(flex: 1, child: Text("")),
                                             Expanded(
                                               flex: 4,
@@ -422,7 +626,8 @@ class _AddProdFormState extends State<AddProdForm> {
                                                                   .black)),
                                                       child: Center(
                                                         child: Text(
-                                                            "Kritik Stok Seviyesi"),
+                                                          "Kritik Stok Seviyesi",
+                                                        ),
                                                       ),
                                                     ),
                                                     Expanded(
@@ -445,6 +650,32 @@ class _AddProdFormState extends State<AddProdForm> {
                                                 ),
                                               ),
                                             ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -458,85 +689,42 @@ class _AddProdFormState extends State<AddProdForm> {
                                                 child: Text(
                                                   "Stok, belirttiğiniz seviyenin altına düştüğünde e-posta ve mobil uygulamamız aracılığı ile haberdar edilir, ürün liste ve sayfalarında kritik miktardaki ürünlerinizi görebilirsiniz.",
                                                   style: TextStyle(
-                                                      fontSize: 8,
+                                                      fontSize: 14,
                                                       fontStyle:
                                                           FontStyle.italic),
                                                 )),
-                                          ],
-                                        ),
-                                      ),
-                                      Divider(),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text("Adı")),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                              flex: 4,
-                                              child: Container(
-                                                height: 45,
-                                                child: TextFormField(
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder()),
-                                                  validator: (value) {
-                                                    // validation logic
-                                                  },
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
                                                 ),
-                                              ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text("Adı")),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                              flex: 4,
-                                              child: Container(
-                                                height: 45,
-                                                child: TextFormField(
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder()),
-                                                  validator: (value) {
-                                                    // validation logic
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                      Divider(
+                                        color: Colors.black,
                                       ),
-                                      Divider(),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -553,45 +741,14 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                            "Alış/Satış Birimi")),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                                flex: 4,
-                                                child: DropdownButton<String>(
-                                                  items: <String>[
-                                                    '%18',
-                                                    '%8',
-                                                    '%1',
-                                                  ].map((String value) {
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value:
-                                                          "11", // selectedvalue
-                                                      child: Text(value),
-                                                    );
-                                                  }).toList(),
-                                                  onChanged: (_) {},
-                                                )),
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text("Adı")),
+                                                          "Vergiler Hariç Alış Fiyatı",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
                                                   ],
                                                 ))),
                                             Expanded(
@@ -599,6 +756,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                               child: Container(
                                                 height: 45,
                                                 child: TextFormField(
+                                                  initialValue: "0,0",
                                                   decoration: const InputDecoration(
                                                       border:
                                                           OutlineInputBorder()),
@@ -607,6 +765,32 @@ class _AddProdFormState extends State<AddProdForm> {
                                                   },
                                                 ),
                                               ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
@@ -626,7 +810,15 @@ class _AddProdFormState extends State<AddProdForm> {
                                                             .bar_chart_outlined)),
                                                     Expanded(
                                                         flex: 1,
-                                                        child: Text("Adı")),
+                                                        child: Text(
+                                                          "Vergiler Hariç Satış Fiyatı",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
                                                   ],
                                                 ))),
                                             Expanded(
@@ -634,6 +826,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                               child: Container(
                                                 height: 45,
                                                 child: TextFormField(
+                                                  initialValue: "0,0",
                                                   decoration: const InputDecoration(
                                                       border:
                                                           OutlineInputBorder()),
@@ -642,6 +835,252 @@ class _AddProdFormState extends State<AddProdForm> {
                                                   },
                                                 ),
                                               ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Divider(
+                                        color: Colors.black,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "KDV",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                                flex: 4,
+                                                child: DropdownButton<String>(
+                                                  value: strkd,
+                                                  items: <String>[
+                                                    '%18',
+                                                    '%8',
+                                                    '%1',
+                                                  ].map((String value) {
+                                                    return DropdownMenuItem<
+                                                        String>(
+                                                      value: value,
+                                                      child: Text(value),
+                                                    );
+                                                  }).toList(),
+                                                  onChanged: (_) {
+                                                    strkd = _;
+                                                  },
+                                                )),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Divider(
+                                        color: Colors.black,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Vergiler Dahil Alış Fiyatı",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                height: 45,
+                                                child: TextFormField(
+                                                  initialValue: "0,0",
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                  validator: (value) {
+                                                    // validation logic
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Vergiler Dahil Satış Fiyatı",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                height: 45,
+                                                child: TextFormField(
+                                                  initialValue: "0,0",
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                  validator: (value) {
+                                                    // validation logic
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),

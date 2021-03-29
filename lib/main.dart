@@ -1,10 +1,27 @@
+import 'dart:io';
+
 import 'package:Muhasebe/ui/addproduct_ui.dart';
+import 'package:Muhasebe/ui/createpdf.dart';
+import 'package:Muhasebe/ui/dinamikui.dart';
+import 'package:Muhasebe/ui/giderbuton.dart';
+import 'package:Muhasebe/ui/kasalistesi.dart';
+import 'package:Muhasebe/ui/nakitbuton.dart';
 import 'package:Muhasebe/ui/product_detail_ui.dart';
+import 'package:Muhasebe/ui/satisbuton.dart';
+import 'package:Muhasebe/ui/satisfatlist.dart';
+import 'package:Muhasebe/ui/stokbuton.dart';
+import 'package:Muhasebe/ui/stokgecmisiui.dart';
+import 'package:Muhasebe/ui/stokrapor.dart';
 import 'package:Muhasebe/ui/urunler_ui.dart';
+import 'package:Muhasebe/ui/yenikasaui.dart';
+import 'package:Muhasebe/ui/yenisatisfatui.dart';
 import 'package:flutter/material.dart';
 import 'package:vertical_navigation_bar/vertical_navigation_bar.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  HttpOverrides.global = new MyHttpOverrides();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -19,6 +36,48 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+/*
+
+     drawer: Drawer(
+          child: ListView(
+        // Important: Remove any padding from the ListView.
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            child: Text('baslik kısmı'),
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+          ),
+          ListTile(
+            title: Text('onay beklenen siparislerim'),
+            onTap: () async {
+             
+            },
+          ),
+          ListTile(
+            title: Text('eski siparislerim'),
+            onTap: () {
+              // Update the state of the app
+              // ...
+              // Then close the drawer
+
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      )),
+
+*/
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -28,10 +87,11 @@ class _MyHomePageState extends State<MyHomePage> {
   final pageController = PageController(initialPage: 0, keepPage: true);
 
   final navItems = [
-    SideNavigationItem(icon: Icons.ac_unit, title: "Hizmet ve Ürünler"),
-    SideNavigationItem(icon: Icons.access_alarm_rounded, title: "Ürün Ekle "),
+    SideNavigationItem(icon: Icons.ac_unit, title: "Faturalar"),
+    SideNavigationItem(icon: Icons.access_alarm_rounded, title: "Giderler "),
+    SideNavigationItem(icon: Icons.access_alarm_rounded, title: "Nakitler"),
     SideNavigationItem(
-        icon: Icons.access_alarm_rounded, title: "Ürün Ayrıntıları"),
+        icon: Icons.access_alarm_rounded, title: "Hizmet ve Ürünler")
   ];
   final initialTab = 0;
 
@@ -59,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: pageController,
               scrollDirection: Axis.vertical,
               physics: NeverScrollableScrollPhysics(),
-              children: [UrunlerUi(), AddProdForm(), ProdDetailui()],
+              children: [Satisbuton(), Giderbuton(), Nakitbuton(), Stokbuton()],
             ),
           )
         ],

@@ -1,25 +1,28 @@
+import 'package:Muhasebe/models/dtofatode.dart';
 import 'package:Muhasebe/models/dtofattahs.dart';
+import 'package:Muhasebe/models/dtoodeharfat.dart';
 import 'package:Muhasebe/models/dtotahsharfat.dart';
 import 'package:Muhasebe/models/dtourungecmisi.dart';
 import 'package:Muhasebe/models/dtourunhareket.dart';
 import 'package:Muhasebe/models/kasa.dart';
+import 'package:Muhasebe/models/odeput.dart';
 import 'package:Muhasebe/models/tahsput.dart';
 import 'package:Muhasebe/models/urunhareket.dart';
 import 'package:Muhasebe/services/apiservices.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
-class SatisfatDetailui extends StatefulWidget {
-  final Dtofattahs dt;
-  SatisfatDetailui(this.dt);
+class AlisfatDetailui extends StatefulWidget {
+  final Dtofatode dt;
+  AlisfatDetailui(this.dt);
   @override
-  _SatisfatDetailuiState createState() => _SatisfatDetailuiState();
+  _AlisfatDetailuiState createState() => _AlisfatDetailuiState();
 }
 
-class _SatisfatDetailuiState extends State<SatisfatDetailui> {
+class _AlisfatDetailuiState extends State<AlisfatDetailui> {
   final _formKey = GlobalKey<FormState>();
   List<Dtourunhareket> lis = [];
-  List<Dtotahsharfat> ltah = [];
+  List<Dtoodeharfat> ltah = [];
   bool _isloading = true;
   bool tahsilform = false;
   DateTime selectedDate = DateTime.now();
@@ -37,7 +40,11 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
     contar = TextEditingController();
     conacik = TextEditingController();
     condeg = TextEditingController();
-    APIServices.tahsharfaticin(widget.dt.tahsid).then((value) => ltah = value);
+    APIServices.odeharfaticin(widget.dt.odeid).then((value) {
+      print("test1");
+      print(value);
+      ltah = value;
+    });
     APIServices.kasalistal().then((value) {
       kasalist = value;
       kas = kasalist[0];
@@ -118,6 +125,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
 
   @override
   Widget build(BuildContext context) {
+    print(ltah.length.toString());
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
         child: Scaffold(
@@ -145,7 +153,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                       child: Row(
                         children: [
                           Text(
-                            "Satış Faturaları > Satış Faturaları",
+                            "Giderler > Fiş/Faturaları",
                             style: TextStyle(
                                 fontSize: 24.0, fontWeight: FontWeight.bold),
                           ),
@@ -228,7 +236,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                               ),
                                               DataColumn(
                                                 label: Text(
-                                                  ' Miktarı',
+                                                  ' Miktar',
                                                   style: TextStyle(
                                                       fontStyle:
                                                           FontStyle.italic),
@@ -359,13 +367,13 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(ltah[index].tediltar),
+                                    Text(ltah[index].odenmistar),
                                     Row(children: [
                                       Icon(Icons.calendar_today),
                                       Text(ltah[index].ad),
                                     ]),
                                     Text(
-                                        "Müşteriden Tahsilat   ${ltah[index].alinmismik} TL")
+                                        "Fiş/Fatura Ödeme   ${ltah[index].odendimik} TL")
                                   ],
                                 );
                               },
@@ -373,7 +381,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                             Align(
                               alignment: Alignment.centerRight,
                               child: Text(
-                                  "Kalan    ${widget.dt.geneltoplam - widget.dt.alinmism}TL"),
+                                  "Kalan    ${widget.dt.geneltoplam - widget.dt.odendimik}TL"),
                             )
                           ],
                         ),
@@ -420,7 +428,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                       children: [
                                         Icon(Icons.enhanced_encryption),
                                         Text(
-                                            "Tahsil Edildi   ${widget.dt.alinmism} TL"),
+                                            "Ödenen Miktar  ${widget.dt.odendimik} TL"),
                                       ],
                                     ),
                                     Row(
@@ -437,7 +445,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                           },
                                         ),
                                         FlatButton(
-                                          child: Text('Tahsilat Ekle'),
+                                          child: Text('Ödeme Ekle'),
                                           color: widget.dt.durum == 0
                                               ? Colors.blueAccent
                                               : Colors.grey,
@@ -460,7 +468,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                         : Column(
                                             children: [
                                               Center(
-                                                child: Text("Tahsilat Ekle"),
+                                                child: Text("Ödeme Ekle"),
                                               ),
                                               Padding(
                                                 padding:
@@ -608,18 +616,19 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                                     //               .save();
                                                     num x = num.tryParse(
                                                         condeg.text);
-                                                    Tahsput tp = Tahsput(
-                                                        widget.dt.tahsid,
+                                                    Odeput tp = Odeput(
+                                                        widget.dt.odeid,
                                                         x,
                                                         widget.dt.geneltoplam,
                                                         selectedDate.toString(),
                                                         kas.kasaid,
                                                         conacik.text);
                                                     bool b = await APIServices
-                                                        .tahsharguncelle(tp);
+                                                        .odeharguncelle(tp);
                                                     print(b.toString());
                                                   },
-                                                  child: Text("Tahsilat Ekle"))
+                                                  child:
+                                                      Text("Odeme Ekle Ekle"))
                                             ],
                                           ),
                                   ],

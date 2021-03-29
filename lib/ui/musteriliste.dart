@@ -1,3 +1,4 @@
+import 'package:Muhasebe/models/dtocarilist.dart';
 import 'package:Muhasebe/models/dtourun.dart';
 import 'package:Muhasebe/models/urun.dart';
 import 'package:Muhasebe/services/apiservices.dart';
@@ -8,16 +9,16 @@ import 'package:Muhasebe/ui/yenikasaui.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
-class UrunlerUi extends StatefulWidget {
+class Musteriliste extends StatefulWidget {
   @override
-  _UrunlerUiState createState() => _UrunlerUiState();
+  _MusterilisteState createState() => _MusterilisteState();
 }
 
-class _UrunlerUiState extends State<UrunlerUi>
+class _MusterilisteState extends State<Musteriliste>
     with AutomaticKeepAliveClientMixin {
   String selectedfilt = "test";
   List<String> lstr = ["Kategori", "Stok Durumu"];
-  List<Dtourun> lis = [];
+  List<Dtocarilist> lis = [];
   bool _isloading = true;
   String dropdownValue = 'Filtrele';
   TextEditingController contara;
@@ -26,7 +27,7 @@ class _UrunlerUiState extends State<UrunlerUi>
     // TODO: implement initState
     super.initState();
     contara = TextEditingController();
-    APIServices.urunal().then((value) {
+    APIServices.msuterial().then((value) {
       Future.delayed(Duration(seconds: 2), () {
         setState(() {
           lis = value;
@@ -48,14 +49,14 @@ class _UrunlerUiState extends State<UrunlerUi>
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.grey.shade300,
+        backgroundColor: Colors.grey.shade200,
         body: LoadingOverlay(
           isLoading: _isloading,
           opacity: 0,
           progressIndicator: Center(
             child: Column(
               children: [
-                Center(child: CircularProgressIndicator()),
+                CircularProgressIndicator(),
                 SizedBox(
                   height: 50,
                 ),
@@ -69,7 +70,7 @@ class _UrunlerUiState extends State<UrunlerUi>
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Row(
                         children: [
                           GestureDetector(
@@ -81,10 +82,9 @@ class _UrunlerUiState extends State<UrunlerUi>
                               );
                             },
                             child: Text(
-                              "Hizmet ve Ürünler",
+                              "Müşteriler",
                               style: TextStyle(
-                                fontSize: 24.0, //fontWeight: FontWeight.bold
-                              ),
+                                  fontSize: 24.0, fontWeight: FontWeight.bold),
                             ),
                           ),
 
@@ -92,7 +92,7 @@ class _UrunlerUiState extends State<UrunlerUi>
                           //       width: 13,  ),
                           Spacer(),
                           Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
+                            padding: const EdgeInsets.only(right: 24.0),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -104,9 +104,8 @@ class _UrunlerUiState extends State<UrunlerUi>
                               child: Text(
                                 "Ahmet Seç",
                                 style: TextStyle(
-                                  fontSize: 24.0,
-                                  // fontWeight: FontWeight.bold
-                                ),
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                           )
@@ -114,7 +113,7 @@ class _UrunlerUiState extends State<UrunlerUi>
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Row(
                         children: [
                           Container(
@@ -156,7 +155,6 @@ class _UrunlerUiState extends State<UrunlerUi>
                           ),
                           Expanded(
                             child: Container(
-                              color: Colors.grey,
                               height: 45,
                               child: TextField(
                                 controller: contara,
@@ -183,20 +181,18 @@ class _UrunlerUiState extends State<UrunlerUi>
                                       },
                                       child: Icon(Icons.search)),
                                   border: OutlineInputBorder(),
-                                  labelText: 'Ara...',
-                                  hintText: 'Ara...',
+                                  labelText: 'Ara',
+                                  hintText: 'Ara',
                                 ),
                               ),
                             ),
                           ),
                           Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4)),
                             height: 45,
                             margin: EdgeInsets.all(20),
                             child: FlatButton(
-                              child: Text('Ürün Ekle'),
-                              color: Colors.grey.shade700,
+                              child: Text('Yeni Müşteri Ekle'),
+                              color: Colors.grey,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.push(
@@ -210,92 +206,41 @@ class _UrunlerUiState extends State<UrunlerUi>
                       ),
                     ),
                     Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4)),
-                        padding: const EdgeInsets.all(8.0),
                         width: wsize,
                         child: DataTable(
-                            //   showCheckboxColumn: true,
-                            //     dataRowHeight: 40,
-                            //     headingRowHeight: 60,
-                            //   headingRowColor: MaterialStateColor.resolveWith(
-                            //         (states) => Colors.blue),
-                            columns: <DataColumn>[
-                              DataColumn(
-                                label:
-                                    Checkbox(value: false, onChanged: (b) {}),
-                              ),
+                            columns: const <DataColumn>[
                               DataColumn(
                                 label: Text(
-                                  'Adı',
-                                  //      style: TextStyle(fontStyle: FontStyle.italic),
+                                  'Unvanı',
+                                  style: TextStyle(fontStyle: FontStyle.italic),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  'Stok Miktarı',
-                                  //        style: TextStyle(fontStyle: FontStyle.italic),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Alış(Vergiler Hariç)',
-                                  //       style: TextStyle(fontStyle: FontStyle.italic),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Satış(Vergiler Hariç)',
-                                  //      style: TextStyle(fontStyle: FontStyle.italic),
+                                  'Bakiye',
+                                  style: TextStyle(fontStyle: FontStyle.italic),
                                 ),
                               ),
                             ],
                             rows: lis
-                                .map((e) => DataRow(
-                                        color: MaterialStateColor.resolveWith(
-                                            (states) => Colors.white),
-                                        cells: [
-                                          DataCell(Checkbox(
-                                            value: true,
-                                            onChanged: (b) {},
-                                          )),
-                                          DataCell(InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ProdDetailui(e)),
-                                                );
-                                              },
-                                              child: Text(e.adi.toString()))),
-                                          DataCell(RichText(
-                                            text: TextSpan(
-                                              text: e.adet.toString(),
-                                              style: TextStyle(
-                                                  color: Colors.black),
-                                              children: <TextSpan>[
-                                                TextSpan(
-                                                    text: e.birim,
-                                                    style: TextStyle(
-                                                        color: Colors.grey)
-                                                    //       fontWeight:
-                                                    //              FontWeight.w300)
-                                                    ),
-                                              ],
-                                            ),
-                                          )),
-                                          DataCell(Text(
-                                            e.verharal.toString(),
-                                            //  style: TextStyle(
-                                            //        fontWeight: FontWeight.bold),
-                                          )),
-                                          DataCell(Text(
-                                            e.verharsat.toString(),
-                                            //      style: TextStyle(
-                                            //            fontWeight: FontWeight.bold),
-                                          )),
-                                        ]))
+                                .map((e) => DataRow(cells: [
+                                      DataCell(InkWell(
+                                          /*   onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProdDetailui(e)),
+                                            );
+                                          },*/
+                                          child:
+                                              Text(e.cariunvani.toString()))),
+                                      DataCell(Text(
+                                        e.bakiye.toString(),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      )),
+                                    ]))
                                 .toList())),
                   ],
                 ),
