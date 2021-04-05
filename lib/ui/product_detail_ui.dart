@@ -1,10 +1,12 @@
-import 'package:Muhasebe/models/dtofattahs.dart';
+import 'package:Muhasebe/models/dtostokdetay.dart';
 import 'package:Muhasebe/models/dtourun.dart';
 import 'package:Muhasebe/models/dtourungecmisi.dart';
-import 'package:Muhasebe/models/urun.dart';
+
 import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/ui/satisfaticinurun.dart';
-import 'package:Muhasebe/ui/urunler_ui.dart';
+
+import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/wdgappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -21,11 +23,14 @@ class _ProdDetailuiState extends State<ProdDetailui>
   TabController _tabController;
   bool _isloading = true;
   List<Dtourungecmisi> lis = [];
+  List<Dtostokdetay> satlist = [];
+  bool fatmi = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = new TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabSelection);
     APIServices.urungecmisial(widget.ur.barkodno).then((value) {
       Future.delayed(Duration(seconds: 2), () {
         setState(() {
@@ -43,11 +48,50 @@ class _ProdDetailuiState extends State<ProdDetailui>
     super.dispose();
   }
 
+  _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      setState(() {
+        if (_tabController.index == 0) {
+          print("1de");
+        } else if (_tabController.index == 1) {
+          APIServices.stokdetayfatsatis(widget.ur.barkodno).then((value) {
+            satlist = value;
+            setState(() {
+              print("tekarra");
+            });
+          });
+        } else {
+          print("e3rrr");
+          APIServices.stokdetayfatalis(widget.ur.barkodno).then((value) {
+            satlist = value;
+            setState(() {
+              print("tekarra");
+            });
+          });
+        }
+        print("setstewf");
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
+          appBar: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.grey.shade300,
+              title: Wdgappbar(
+                  "Hizmet ve Ürünler >", "Hizmet ve Ürün", "Ahmet Seç")),
+          drawer: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors
+                  .black87, //This will change the drawer background to blue.
+              //other styles
+            ),
+            child: Drawer(child: Wdgdrawer()),
+          ),
           backgroundColor: Colors.grey.shade300,
           //       Color.fromRGBO(220, 221, 220, 1),
           body: LoadingOverlay(
@@ -70,43 +114,6 @@ class _ProdDetailuiState extends State<ProdDetailui>
                   child: SingleChildScrollView(
                     child: Expanded(
                       child: Column(children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              RichText(
-                                text: TextSpan(
-                                  text: "Hizmet ve Ürünler >",
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 24),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: "Hizmet ve Ürün",
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 24)
-                                        //       fontWeight:
-                                        //              FontWeight.w300)
-                                        ),
-                                  ],
-                                ),
-                              ),
-
-                              //   SizedBox(
-                              //       width: 13,  ),
-                              Spacer(),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Text(
-                                  "Ahmet Seç",
-                                  style: TextStyle(
-                                    fontSize: 24.0,
-                                    //    fontWeight: FontWeight.bold
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -387,32 +394,28 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                                     label: Text(
                                                       'İşlem Türü',
                                                       style: TextStyle(
-                                                          fontStyle:
-                                                              FontStyle.italic),
+                                                          color: Colors.grey),
                                                     ),
                                                   ),
                                                   DataColumn(
                                                     label: Text(
                                                       'Müşteri/Tedarikçi',
                                                       style: TextStyle(
-                                                          fontStyle:
-                                                              FontStyle.italic),
+                                                          color: Colors.grey),
                                                     ),
                                                   ),
                                                   DataColumn(
                                                     label: Text(
                                                       'İşlem Tarihi',
                                                       style: TextStyle(
-                                                          fontStyle:
-                                                              FontStyle.italic),
+                                                          color: Colors.grey),
                                                     ),
                                                   ),
                                                   DataColumn(
                                                     label: Text(
                                                       'Miktar',
                                                       style: TextStyle(
-                                                          fontStyle:
-                                                              FontStyle.italic),
+                                                          color: Colors.grey),
                                                     ),
                                                   ),
                                                 ],
@@ -424,7 +427,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                                                   context,
                                                                   MaterialPageRoute(
                                                                       builder: (context) =>
-                                                                          SatisfatDetailicinurun(
+                                                                          Satfatdetailicinurun(
                                                                               e.fatid)),
                                                                 );
                                                               },
@@ -447,10 +450,206 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                                         ]))
                                                     .toList())),
                                         Container(
-                                          child: Text("sign up"),
+                                          child: Container(
+                                              width: wsize,
+                                              child: DataTable(
+                                                  headingRowColor:
+                                                      MaterialStateColor
+                                                          .resolveWith(
+                                                              (states) => Colors
+                                                                  .grey
+                                                                  .shade200),
+                                                  columns: const <DataColumn>[
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Geçmiş İşlemler',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Müşteri',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'İşlem Tarihi',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Miktar',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Br. Fiyat',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Toplam Fiyat',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                  rows: satlist
+                                                      .map((e) =>
+                                                          DataRow(cells: [
+                                                            DataCell(InkWell(
+                                                                onTap: () {
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                Satfatdetailicinurun(e.fatid)),
+                                                                  );
+                                                                },
+                                                                child: Text(e
+                                                                    .fatacik
+                                                                    .toString()))),
+                                                            DataCell(Text(
+                                                              e.ad.toString(),
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                            DataCell(Text(
+                                                              e.duzt.toString(),
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                            DataCell(Text(
+                                                              e.miktar
+                                                                  .toString(),
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                            DataCell(Text(
+                                                              e.brfiyat
+                                                                  .toString(),
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                            DataCell(Text(
+                                                              "${e.miktar * e.brfiyat}",
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                          ]))
+                                                      .toList())),
                                         ),
                                         Container(
-                                          child: Text("login"),
+                                          child: Container(
+                                              width: wsize,
+                                              child: DataTable(
+                                                  headingRowColor:
+                                                      MaterialStateColor
+                                                          .resolveWith(
+                                                              (states) => Colors
+                                                                  .grey
+                                                                  .shade200),
+                                                  columns: const <DataColumn>[
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'İşlem Türü',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Tedarikçi',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'İşlem Tarihi',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Miktar',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Br. Fiyat',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                    DataColumn(
+                                                      label: Text(
+                                                        'Toplam Fiyat',
+                                                        style: TextStyle(
+                                                            color: Colors.grey),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                  rows: satlist
+                                                      .map((e) =>
+                                                          DataRow(cells: [
+                                                            DataCell(InkWell(
+                                                                onTap: () {
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                Satfatdetailicinurun(e.fatid)),
+                                                                  );
+                                                                },
+                                                                child: Text(e
+                                                                    .fatacik
+                                                                    .toString()))),
+                                                            DataCell(Text(
+                                                              e.ad.toString(),
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                            DataCell(Text(
+                                                              e.duzt.toString(),
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                            DataCell(Text(
+                                                              e.miktar
+                                                                  .toString(),
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                            DataCell(Text(
+                                                              e.brfiyat
+                                                                  .toString(),
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                            DataCell(Text(
+                                                              "${e.miktar * e.brfiyat}",
+                                                              style:
+                                                                  TextStyle(),
+                                                            )),
+                                                          ]))
+                                                      .toList())),
                                         ),
                                       ]),
                                 )

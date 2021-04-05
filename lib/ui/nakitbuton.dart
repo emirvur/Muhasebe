@@ -1,3 +1,4 @@
+import 'package:Muhasebe/utils/createpdf.dart';
 import 'package:Muhasebe/ui/kasalistesi.dart';
 import 'package:Muhasebe/ui/satisfatlist.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,12 @@ class _NakitbutonState extends State<Nakitbuton> {
                     MaterialPageRoute(builder: (context) => KasaListesiui()));
               },
               child: Text("Kasalar")),
+          /*    TextButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PDFSave()));
+              },
+              child: Text("pdf save")),*/
           /* TextButton(
               onPressed: () {
                 Navigator.push(context,

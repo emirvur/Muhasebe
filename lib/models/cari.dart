@@ -26,7 +26,7 @@ class Cari {
       this.tckn,
       this.bakiye); //kategori eklerken kullan, çünkü id db tarafından olusturuluyor
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap(int x) {
     var map = Map<String, dynamic>();
     //  map['cariId'] = cariId;
     map['cariunvani'] = cariunvani;
@@ -40,6 +40,7 @@ class Cari {
     map['turu'] = turu;
     map['tckn'] = tckn;
     map['bakiye'] = bakiye;
+    map['hangicari'] = x;
 
     return map;
   }

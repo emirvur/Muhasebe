@@ -5,6 +5,8 @@ import 'package:Muhasebe/ui/addproduct_ui.dart';
 import 'package:Muhasebe/ui/kasalistesi.dart';
 import 'package:Muhasebe/ui/product_detail_ui.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
+import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/wdgappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -27,7 +29,7 @@ class _UrunlerUiState extends State<UrunlerUi>
     super.initState();
     contara = TextEditingController();
     APIServices.urunal().then((value) {
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           lis = value;
           _isloading = false;
@@ -48,6 +50,18 @@ class _UrunlerUiState extends State<UrunlerUi>
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.grey.shade300,
+            title: Wdgappbar("", "Hizmet ve Ürünler ", "Ahmet Seç")),
+        drawer: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors
+                .black87, //This will change the drawer background to blue.
+            //other styles
+          ),
+          child: Drawer(child: Wdgdrawer()),
+        ),
         backgroundColor: Colors.grey.shade300,
         body: LoadingOverlay(
           isLoading: _isloading,
@@ -72,55 +86,10 @@ class _UrunlerUiState extends State<UrunlerUi>
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => KasaListesiui()),
-                              );
-                            },
-                            child: Text(
-                              "Hizmet ve Ürünler",
-                              style: TextStyle(
-                                fontSize: 24.0, //fontWeight: FontWeight.bold
-                              ),
-                            ),
-                          ),
-
-                          //   SizedBox(
-                          //       width: 13,  ),
-                          Spacer(),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Yenikasaui()),
-                                );
-                              },
-                              child: Text(
-                                "Ahmet Seç",
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  // fontWeight: FontWeight.bold
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
                           Container(
                               height: 45,
                               decoration: BoxDecoration(
-                                  color: Colors.grey,
+                                  color: Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(color: Colors.black)),
                               child: DropdownButton<String>(
@@ -156,7 +125,7 @@ class _UrunlerUiState extends State<UrunlerUi>
                           ),
                           Expanded(
                             child: Container(
-                              color: Colors.grey,
+                              color: Colors.grey.shade100,
                               height: 45,
                               child: TextField(
                                 controller: contara,
@@ -202,101 +171,127 @@ class _UrunlerUiState extends State<UrunlerUi>
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => AddProdForm()));
+                                        builder: (context) =>
+                                            AddProdForm())).then((e) {
+                                  e == null
+                                      ? print("gggg")
+                                      : setState(() {
+                                          lis.add(e);
+                                          print(lis.length.toString());
+                                        });
+                                  /*         setState(() {
+                                    print("ee");
+                                    _isloading = true;
+                                  });
+                                  setState(() async {
+                                    await APIServices.urunal();
+                                    _isloading = false;
+                                  });*/
+                                });
                               },
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4)),
-                        padding: const EdgeInsets.all(8.0),
-                        width: wsize,
-                        child: DataTable(
-                            //   showCheckboxColumn: true,
-                            //     dataRowHeight: 40,
-                            //     headingRowHeight: 60,
-                            //   headingRowColor: MaterialStateColor.resolveWith(
-                            //         (states) => Colors.blue),
-                            columns: <DataColumn>[
-                              DataColumn(
-                                label:
-                                    Checkbox(value: false, onChanged: (b) {}),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Adı',
-                                  //      style: TextStyle(fontStyle: FontStyle.italic),
+                    SingleChildScrollView(
+                      physics: ScrollPhysics(),
+                      child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4)),
+                          padding: const EdgeInsets.all(8.0),
+                          width: wsize,
+                          child: DataTable(
+                              //   showCheckboxColumn: true,
+                              //     dataRowHeight: 40,
+                              //     headingRowHeight: 60,
+                              //   headingRowColor: MaterialStateColor.resolveWith(
+                              //         (states) => Colors.blue),
+                              columns: <DataColumn>[
+                                DataColumn(
+                                  label:
+                                      Checkbox(value: false, onChanged: (b) {}),
                                 ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Stok Miktarı',
-                                  //        style: TextStyle(fontStyle: FontStyle.italic),
+                                DataColumn(
+                                  label: Text(
+                                    'Adı',
+                                    style: TextStyle(
+                                        color: Colors.teal, fontSize: 16),
+                                  ),
                                 ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Alış(Vergiler Hariç)',
-                                  //       style: TextStyle(fontStyle: FontStyle.italic),
+                                DataColumn(
+                                  label: Text(
+                                    'Stok Miktarı',
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 16),
+                                  ),
                                 ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Satış(Vergiler Hariç)',
-                                  //      style: TextStyle(fontStyle: FontStyle.italic),
+                                DataColumn(
+                                  label: Text(
+                                    'Alış(Vergiler Hariç)',
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 16),
+                                  ),
                                 ),
-                              ),
-                            ],
-                            rows: lis
-                                .map((e) => DataRow(
-                                        color: MaterialStateColor.resolveWith(
-                                            (states) => Colors.white),
-                                        cells: [
-                                          DataCell(Checkbox(
-                                            value: true,
-                                            onChanged: (b) {},
-                                          )),
-                                          DataCell(InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ProdDetailui(e)),
-                                                );
-                                              },
-                                              child: Text(e.adi.toString()))),
-                                          DataCell(RichText(
-                                            text: TextSpan(
-                                              text: e.adet.toString(),
-                                              style: TextStyle(
-                                                  color: Colors.black),
-                                              children: <TextSpan>[
-                                                TextSpan(
-                                                    text: e.birim,
-                                                    style: TextStyle(
-                                                        color: Colors.grey)
-                                                    //       fontWeight:
-                                                    //              FontWeight.w300)
-                                                    ),
-                                              ],
-                                            ),
-                                          )),
-                                          DataCell(Text(
-                                            e.verharal.toString(),
-                                            //  style: TextStyle(
-                                            //        fontWeight: FontWeight.bold),
-                                          )),
-                                          DataCell(Text(
-                                            e.verharsat.toString(),
-                                            //      style: TextStyle(
-                                            //            fontWeight: FontWeight.bold),
-                                          )),
-                                        ]))
-                                .toList())),
+                                DataColumn(
+                                  label: Text(
+                                    'Satış(Vergiler Hariç)',
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 16),
+                                  ),
+                                ),
+                              ],
+                              rows: lis
+                                  .map((e) => DataRow(
+                                          color: MaterialStateColor.resolveWith(
+                                              (states) => Colors.white),
+                                          cells: [
+                                            DataCell(Checkbox(
+                                              value: true,
+                                              onChanged: (b) {},
+                                            )),
+                                            DataCell(InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ProdDetailui(e)),
+                                                  );
+                                                },
+                                                child: Text(
+                                                  e.adi.toString(),
+                                                  style:
+                                                      TextStyle(fontSize: 16),
+                                                ))),
+                                            DataCell(RichText(
+                                              text: TextSpan(
+                                                text: e.adet.toString(),
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16),
+                                                children: <TextSpan>[
+                                                  TextSpan(
+                                                      text: e.birim,
+                                                      style: TextStyle(
+                                                          color: Colors.grey)
+                                                      //       fontWeight:
+                                                      //              FontWeight.w300)
+                                                      ),
+                                                ],
+                                              ),
+                                            )),
+                                            DataCell(Text(
+                                              e.verharal.toString(),
+                                              style: TextStyle(fontSize: 16),
+                                            )),
+                                            DataCell(Text(
+                                              e.verharsat.toString(),
+                                              style: TextStyle(fontSize: 16),
+                                            )),
+                                          ]))
+                                  .toList())),
+                    ),
                   ],
                 ),
               )

@@ -1,5 +1,8 @@
 import 'package:Muhasebe/models/kasa.dart';
 import 'package:Muhasebe/services/apiservices.dart';
+import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgfakebutton.dart';
 
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
@@ -16,12 +19,30 @@ class _YenikasauiState extends State<Yenikasaui> {
   bool _isLoading = false;
   String hes;
   int bak;
+
+  DateTime pickedDate;
+  DateTime pickedduztar;
+
+  _pickDate() async {
+    DateTime date = await showDatePicker(
+      context: context,
+      firstDate: DateTime(DateTime.now().year - 5),
+      lastDate: DateTime(DateTime.now().year + 5),
+      initialDate: pickedDate,
+    );
+    if (date != null)
+      setState(() {
+        pickedDate = date;
+      });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     conthes = TextEditingController();
     contbak = TextEditingController();
+    pickedDate = DateTime.now();
   }
 
   @override
@@ -51,7 +72,8 @@ class _YenikasauiState extends State<Yenikasaui> {
           // stop the modal progress HUD
           _isLoading = false;
         });
-        Navigator.of(context).pop();
+        //  Kasa k = Kasa();
+        Navigator.of(context).pop(1);
       });
     }
   }
@@ -61,7 +83,19 @@ class _YenikasauiState extends State<Yenikasaui> {
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
-          backgroundColor: Colors.grey.shade200,
+          appBar: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.grey.shade300,
+              title: Wdgappbar("Kasa ve Bankalar >", "Yeni Kasa", "Ahmet Seç")),
+          drawer: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors
+                  .black87, //This will change the drawer background to blue.
+              //other styles
+            ),
+            child: Drawer(child: Wdgdrawer()),
+          ),
+          backgroundColor: Colors.grey.shade300,
           body: LoadingOverlay(
             isLoading: _isLoading,
             progressIndicator: Column(
@@ -73,32 +107,6 @@ class _YenikasauiState extends State<Yenikasaui> {
                   child: SingleChildScrollView(
                     child: Expanded(
                       child: Column(children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                "Kasa ve Bankalar > Yeni Kasa",
-                                style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-
-                              //   SizedBox(
-                              //       width: 13,  ),
-                              Spacer(),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 24.0),
-                                child: Text(
-                                  "Ahmet Seç",
-                                  style: TextStyle(
-                                      fontSize: 24.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                         Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
@@ -116,7 +124,7 @@ class _YenikasauiState extends State<Yenikasaui> {
                                           child: Row(
                                             children: [
                                               Expanded(
-                                                  flex: 2,
+                                                  flex: 1,
                                                   child: Center(
                                                       child: Row(
                                                     children: [
@@ -125,9 +133,16 @@ class _YenikasauiState extends State<Yenikasaui> {
                                                           child: Icon(
                                                               Icons.money)),
                                                       Expanded(
-                                                          flex: 2,
+                                                          flex: 1,
                                                           child: Text(
-                                                              "Hesap İsmi*")),
+                                                            "Hesap İsmi*",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          )),
                                                     ],
                                                   ))),
                                               Expanded(
@@ -216,7 +231,14 @@ class _YenikasauiState extends State<Yenikasaui> {
                                                       Expanded(
                                                           flex: 2,
                                                           child: Text(
-                                                              "Açılış Bakiyesi")),
+                                                            "Açılış Bakiyesi",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          )),
                                                     ],
                                                   ))),
                                               Expanded(
@@ -245,7 +267,60 @@ class _YenikasauiState extends State<Yenikasaui> {
                                                   ),
                                                 ),
                                               ),
+                                              Wdgfakebutton()
                                               //    Spacer()
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: Center(
+                                                      child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Icon(Icons
+                                                              .bar_chart_outlined)),
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Text(
+                                                            "Açılış Bakiyesi Tarihi",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          )),
+                                                    ],
+                                                  ))),
+                                              Expanded(
+                                                flex: 4,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      ListTile(
+                                                        title: Text(
+                                                            " ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}"),
+                                                        trailing: Icon(Icons
+                                                            .calendar_today),
+                                                        onTap: _pickDate,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              Wdgfakebutton()
                                             ],
                                           ),
                                         ),

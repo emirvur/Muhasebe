@@ -2,6 +2,8 @@ import 'package:Muhasebe/models/kasa.dart';
 import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/ui/kasaharui.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
+import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/wdgappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -34,6 +36,18 @@ class _KasaListesiuiState extends State<KasaListesiui>
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.grey.shade300,
+            title: Wdgappbar("Kasa ve Bankalar >", "", "Ahmet Seç")),
+        drawer: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors
+                .black87, //This will change the drawer background to blue.
+            //other styles
+          ),
+          child: Drawer(child: Wdgdrawer()),
+        ),
         backgroundColor: Colors.grey.shade300,
         body: LoadingOverlay(
           isLoading: _isloading,
@@ -55,41 +69,7 @@ class _KasaListesiuiState extends State<KasaListesiui>
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            "Kasa ve Bankalar",
-                            style: TextStyle(
-                                fontSize: 24.0, fontWeight: FontWeight.bold),
-                          ),
-
-                          //   SizedBox(
-                          //       width: 13,  ),
-                          Spacer(),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 24.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Yenikasaui()),
-                                );
-                              },
-                              child: Text(
-                                "Ahmet Seç",
-                                style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
                           Spacer(),
@@ -98,10 +78,27 @@ class _KasaListesiuiState extends State<KasaListesiui>
                             margin: EdgeInsets.all(20),
                             child: FlatButton(
                               child: Text('Kasa Ekle'),
-                              color: Colors.grey,
+                              color: Colors.grey.shade700,
                               textColor: Colors.white,
                               onPressed: () {
-                                print("kasa ekleye basildi");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Yenikasaui()),
+                                ).then((b) {
+                                  b != 1
+                                      ? print("fff")
+                                      : APIServices.kasaal().then((value) {
+                                          Future.delayed(Duration(seconds: 1),
+                                              () {
+                                            setState(() {
+                                              print("aaaa");
+                                              lis = value;
+                                              //        _isloading = false;
+                                            });
+                                          });
+                                        });
+                                });
                               },
                             ),
                           ),
@@ -110,7 +107,7 @@ class _KasaListesiuiState extends State<KasaListesiui>
                             margin: EdgeInsets.all(20),
                             child: FlatButton(
                               child: Text('Banka Ekle'),
-                              color: Colors.blueAccent,
+                              color: Colors.grey.shade700,
                               textColor: Colors.white,
                               onPressed: () {},
                             ),
@@ -121,45 +118,75 @@ class _KasaListesiuiState extends State<KasaListesiui>
                     Container(
                         width: wsize,
                         child: DataTable(
+                            columnSpacing: 400,
                             columns: const <DataColumn>[
                               DataColumn(
                                 label: Text(
-                                  'Kasa ismi',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                  'Hesap ismi',
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
                                   'Iban',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                  style: TextStyle(
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
                                   'Bakiye',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                  style: TextStyle(
+                                      color: Colors.teal,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
                             rows: lis
-                                .map((e) => DataRow(cells: [
-                                      DataCell(InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      Kasaharui(e)),
-                                            );
-                                          },
-                                          child: Text(e.kasaAd.toString()))),
-                                      DataCell(Text("-")),
-                                      DataCell(Text(
-                                        e.bakiye.toString(),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                    ]))
+                                .map((e) => DataRow(
+                                        color: MaterialStateColor.resolveWith(
+                                            (states) => Colors.white),
+                                        cells: [
+                                          DataCell(InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Kasaharui(e)),
+                                                ).then((b) {
+                                                  b != 1
+                                                      ? print("fff")
+                                                      : APIServices.kasaal()
+                                                          .then((value) {
+                                                          Future.delayed(
+                                                              Duration(
+                                                                  seconds: 1),
+                                                              () {
+                                                            setState(() {
+                                                              print("aaaa");
+                                                              lis = value;
+                                                              //        _isloading = false;
+                                                            });
+                                                          });
+                                                        });
+                                                });
+                                              },
+                                              child: Text(
+                                                e.kasaAd.toString(),
+                                                style: TextStyle(fontSize: 18),
+                                              ))),
+                                          DataCell(Text("-")),
+                                          DataCell(Text(
+                                            e.bakiye.toString(),
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold),
+                                          )),
+                                        ]))
                                 .toList())),
                   ],
                 ),

@@ -1,35 +1,31 @@
 import 'package:Muhasebe/models/cari.dart';
-import 'package:Muhasebe/models/dtofattahs.dart';
 import 'package:Muhasebe/models/dtourun.dart';
 import 'package:Muhasebe/models/fatura.dart';
 import 'package:Muhasebe/models/kasa.dart';
 import 'package:Muhasebe/models/postfat.dart';
 import 'package:Muhasebe/models/tahsilat.dart';
 import 'package:Muhasebe/models/urun.dart';
-import 'package:Muhasebe/models/urunhareket.dart';
 import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
-import 'package:Muhasebe/utils/wdgfakebutton.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
-class Yenisatfatui extends StatefulWidget {
+class Yenialisfatui extends StatefulWidget {
   @override
-  _YenisatfatuiState createState() => _YenisatfatuiState();
+  _YenialisfatuiState createState() => _YenialisfatuiState();
 }
 
-class _YenisatfatuiState extends State<Yenisatfatui> {
+class _YenialisfatuiState extends State<Yenialisfatui> {
   final _formKey = GlobalKey<FormState>();
   bool ischeck = false;
-  bool irsa = false;
   List lis = [1];
-  bool tahsett = true;
-
+  bool irsa = false;
+  bool odendimi = false;
+  bool tahsedilce = false;
   List<Kasa> ksl = [];
   Cari cari = Cari(1, "ss", "", 1, ",", "", "", "", "", 1, "", 1);
-  List<Cari> liscar =
-      []; //[Cari(1, "ss", "", 1, ",", "", "", "", "", 1, "", 1)];
+  List<Cari> liscar = [];
   List<Dtourun> lisurun;
   bool _isloading = false;
   TextEditingController conmus;
@@ -41,12 +37,9 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
   String tahsacik = "";
   Dtourun urun = Dtourun(0, "", 1, "", "", 0, 0, 0, 0, 0);
   Dtourun urun2 = Dtourun(1, "", 1, "", "", 0, 0, 0, 0, 0);
-  num aratop = 0;
-  num topkdv = 0;
 
   DateTime pickedDate;
   DateTime pickedduztar;
-  DateTime pickedvad;
   @override
   void initState() {
     super.initState();
@@ -54,7 +47,6 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
     conur = TextEditingController();
     conur2 = TextEditingController();
     pickedDate = DateTime.now();
-    pickedvad = DateTime.now();
     pickedduztar = DateTime.now();
     APIServices.kasalistal().then((value) {
       Future.delayed(Duration(seconds: 2), () {
@@ -94,7 +86,7 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
   }
 
   cariara(String ar) async {
-    liscar = await APIServices.mustara(ar);
+    liscar = await APIServices.tedara(ar);
   }
 
   urunara(String ar) async {
@@ -159,7 +151,7 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
           appBar: AppBar(
               elevation: 0,
               backgroundColor: Colors.grey.shade300,
-              title: Wdgappbar("Satış Faturaları >", "Yeni", "Ahmet Seç")),
+              title: Wdgappbar("Giderler >", "Yeni Fiş Fatura", "Ahmet Seç")),
           drawer: Theme(
             data: Theme.of(context).copyWith(
               canvasColor: Colors
@@ -215,15 +207,15 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                         flex: 1,
                                                         child: Icon(
                                                           Icons.file_copy,
-                                                          color: Colors.blue,
+                                                          color: Colors.brown,
                                                         )),
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                          "Fatura Açıklaması",
+                                                          " Açıklama",
                                                           style: TextStyle(
                                                               color:
-                                                                  Colors.grey,
+                                                                  Colors.brown,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold),
@@ -233,7 +225,7 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                             Expanded(
                                               flex: 4,
                                               child: Container(
-                                                height: 45,
+                                                //         height: 45,
                                                 child: TextFormField(
                                                   onSaved: (v) {
                                                     fatacik = v;
@@ -243,7 +235,7 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                           OutlineInputBorder()),
                                                   validator: (value) {
                                                     if (value.isEmpty) {
-                                                      return "Fatura Açıklaması boş olamaz";
+                                                      return "Açıklama kısmı boş olamaz";
                                                     }
                                                     return null;
                                                   },
@@ -275,89 +267,65 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                   height: 45,
                                                   margin: EdgeInsets.all(20),
                                                   child: FlatButton(
-                                                    child: Text('Kaydet'),
-                                                    color: Colors.grey.shade700,
-                                                    textColor: Colors.white,
-                                                    onPressed: () async {
-                                                      if (_formKey.currentState
-                                                          .validate()) {
-                                                        _formKey.currentState
-                                                            .save();
-                                                        num x = urun.adet *
-                                                            (urun.verharsat +
-                                                                urun.verharsat *
-                                                                    urun.kdv);
-                                                        num y = urun2.adet *
-                                                            (urun2.verharsat +
-                                                                urun2.verharsat *
-                                                                    urun2.kdv);
-                                                        Postfatura1 p =
-                                                            Postfatura1(
-                                                                1,
-                                                                fatacik,
-                                                                cari.cariId,
-                                                                pickedduztar
-                                                                    .toString(),
-                                                                1,
-                                                                urun.verharsat +
-                                                                    urun2
-                                                                        .verharsat,
-                                                                0,
-                                                                urun.kdv +
-                                                                    urun2.kdv,
-                                                                x + y,
-                                                                null,
-                                                                tahsett == true
-                                                                    ? kas.kasaid
-                                                                    : 1,
-                                                                tahsett == true
-                                                                    ? 1
-                                                                    : 0,
-                                                                pickedDate
-                                                                    .toString(),
-                                                                pickedDate
-                                                                    .toString(),
-                                                                tahsett == true
-                                                                    ? tahsacik
-                                                                    : "",
-                                                                tahsett == true
-                                                                    ? x + y
-                                                                    : 0,
-                                                                x + y);
-                                                        List<Hareket> listur = [
-                                                          Hareket(
-                                                              barkodno:
-                                                                  urun.barkodno,
-                                                              miktar: 1,
-                                                              brfiyat: urun
-                                                                  .verharsat,
-                                                              vergi: urun.kdv),
-                                                          Hareket(
-                                                              barkodno: urun2
-                                                                  .barkodno,
-                                                              miktar: 1,
-                                                              brfiyat: urun2
-                                                                  .verharsat,
-                                                              vergi: urun2.kdv)
-                                                        ];
-                                                        Postfatura pf =
-                                                            Postfatura(
-                                                                p, listur);
-
-                                                        /*    Urunhareket ur1 =
-                                                            Urunhareket(
-                                                          -1,
-                                                        );*/
-                                                        bool h =
-                                                            await APIServices
-                                                                .faturaekle(pf);
-                                                        print(h);
-                                                        //   Dtofattahs fat=Dtofattahs(fatid, fatTur, durum, cariId, cariad, duztarih, fataciklama, katad, aratop, araind, kdv, geneltoplam, vadta, alta, alinmism, tahsid)
-                                                        Navigator.of(context)
-                                                            .pop(1);
-                                                      }
-                                                    },
-                                                  ),
+                                                      child: Text('Kaydet'),
+                                                      color:
+                                                          Colors.grey.shade700,
+                                                      textColor: Colors.white,
+                                                      onPressed: () async {
+                                                        if (_formKey
+                                                            .currentState
+                                                            .validate()) {
+                                                          _formKey.currentState
+                                                              .save();
+                                                          num x = urun.adet *
+                                                              (urun.verharsat +
+                                                                  urun.verharsat *
+                                                                      urun.kdv);
+                                                          num y = urun2.adet *
+                                                              (urun2.verharsat +
+                                                                  urun2.verharsat *
+                                                                      urun2
+                                                                          .kdv);
+                                                          /*       Postfatura pf = Postfatura(
+                                                              0,
+                                                              fatacik,
+                                                              cari.cariId,
+                                                              pickedduztar
+                                                                  .toString(),
+                                                              1,
+                                                              urun.verharsat +
+                                                                  urun2
+                                                                      .verharsat,
+                                                              0,
+                                                              urun.kdv +
+                                                                  urun2.kdv,
+                                                              x + y,
+                                                              null,
+                                                              odendimi == true
+                                                                  ? kas.kasaid
+                                                                  : 1,
+                                                              odendimi == true
+                                                                  ? 1
+                                                                  : 0,
+                                                              pickedDate
+                                                                  .toString(),
+                                                              pickedDate
+                                                                  .toString(),
+                                                              "",
+                                                              odendimi == true
+                                                                  ? x + y
+                                                                  : 0,
+                                                              x + y);
+                                                          bool h =
+                                                              await APIServices
+                                                                  .faturaekle(
+                                                                      pf);
+                                                          print(h);*/
+                                                          //   Dtofattahs fat=Dtofattahs(fatid, fatTur, durum, cariId, cariad, duztarih, fataciklama, katad, aratop, araind, kdv, geneltoplam, vadta, alta, alinmism, tahsid)
+                                                          Navigator.of(context)
+                                                              .pop(1);
+                                                        }
+                                                      }),
                                                 ),
                                               ],
                                             ),
@@ -380,25 +348,21 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                             .bar_chart_outlined)),
                                                     Expanded(
                                                         flex: 1,
-                                                        child: Column(
-                                                          children: [
-                                                            Text(
-                                                              "Müşteri",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .grey,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
-                                                            ),
-                                                          ],
+                                                        child: Text(
+                                                          "Tedarikçi",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
                                                         )),
                                                   ],
                                                 ))),
                                             Expanded(
                                               flex: 4,
                                               child: Container(
-                                                //  height: 45,
+                                                //   height: 50,
                                                 //   width: 45,
                                                 child: Column(
                                                   children: [
@@ -417,9 +381,9 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                           const InputDecoration(
                                                               border:
                                                                   OutlineInputBorder()),
-                                                      //    validator: (value) {
-                                                      // validation logic
-                                                      //      },
+                                                      validator: (value) {
+                                                        // validation logic
+                                                      },
                                                     ),
                                                     cari.cariunvani != "ss"
                                                         ? Align(
@@ -433,7 +397,32 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                 ),
                                               ),
                                             ),
-                                            Wdgfakebutton()
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -502,7 +491,7 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                         ListTileControlAffinity
                                                             .leading,
                                                     title: Text(
-                                                        "İrsaliyeli Satış"),
+                                                        "İrsaliyeli Fatura"),
                                                     value: irsa,
                                                     onChanged: (value) {
                                                       setState(() {
@@ -523,7 +512,7 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                         ListTileControlAffinity
                                                             .leading,
                                                     title: Text(
-                                                        "Irsaliyesiz Satış"),
+                                                        "Irsaliyesiz Alış"),
                                                     value: !irsa,
                                                     onChanged: (value) {
                                                       setState(() {
@@ -532,10 +521,183 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                     },
                                                   )),
                                             ),
-                                            Wdgfakebutton()
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Fiş Fatura Tarihi",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black)),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    ListTile(
+                                                      title: Text(
+                                                          " ${pickedduztar.year}, ${pickedduztar.month}, ${pickedduztar.day}"),
+                                                      trailing: Icon(
+                                                          Icons.calendar_today),
+                                                      //onTap: _pickDate1,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      /*       Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Fiş Fatura numarası",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                height: 45,
+                                                child: TextFormField(
+                                                  onSaved: (s) {
+                                                    tahsacik = s ?? "";
+                                                  },
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                  validator: (value) {
+                                                    // validation logic
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),*/
                                       Divider(
                                         height: 20,
                                       ),
@@ -555,7 +717,7 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                          "Tahsilat Durumu",
+                                                          "Ödeme Durumu",
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.grey,
@@ -576,12 +738,11 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                     controlAffinity:
                                                         ListTileControlAffinity
                                                             .leading,
-                                                    title:
-                                                        Text("Tahsil Edilecek"),
-                                                    value: !tahsett,
+                                                    title: Text("Ödenecek"),
+                                                    value: !odendimi,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        tahsett = !tahsett;
+                                                        odendimi = !odendimi;
                                                       });
                                                     },
                                                   )),
@@ -597,230 +758,101 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                     controlAffinity:
                                                         ListTileControlAffinity
                                                             .leading,
-                                                    title:
-                                                        Text("Tahsil Edildi"),
-                                                    value: tahsett,
+                                                    title: Text("Ödendi"),
+                                                    value: odendimi,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        tahsett = !tahsett;
+                                                        odendimi = !odendimi;
                                                       });
                                                     },
                                                   )),
                                             ),
-                                            Wdgfakebutton()
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ),
-                                      tahsett != true
-                                          ? Container(
-                                              child: Column(
+                                      odendimi == true
+                                          ? Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
                                                 children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            flex: 1,
-                                                            child: Center(
-                                                                child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .bar_chart_outlined)),
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                      "Düzenleme Tarihi",
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .grey,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    )),
-                                                              ],
-                                                            ))),
-                                                        Expanded(
-                                                          flex: 4,
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                border: Border.all(
+                                                  Expanded(
+                                                      flex: 1,
+                                                      child: Center(
+                                                          child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                              flex: 1,
+                                                              child: Icon(Icons
+                                                                  .bar_chart_outlined)),
+                                                          Expanded(
+                                                              flex: 1,
+                                                              child: Text(
+                                                                "Ödendiği tarih ve hesab",
+                                                                style: TextStyle(
                                                                     color: Colors
-                                                                        .black)),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: <
-                                                                  Widget>[
-                                                                ListTile(
-                                                                  title: Text(
-                                                                      " ${pickedduztar.year}, ${pickedduztar.month}, ${pickedduztar.day}"),
-                                                                  trailing:
-                                                                      Icon(Icons
-                                                                          .calendar_today),
-                                                                  onTap:
-                                                                      _pickDate1,
-                                                                ),
-                                                              ],
-                                                            ),
+                                                                        .grey,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              )),
+                                                        ],
+                                                      ))),
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Container(
+                                                      height: 60,
+                                                      decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                              color: Colors
+                                                                  .black)),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          ListTile(
+                                                            title: Text(
+                                                                " ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}"),
+                                                            trailing: Icon(Icons
+                                                                .calendar_today),
+                                                            onTap: _pickDate,
                                                           ),
-                                                        ),
-                                                        Wdgfakebutton()
-                                                      ],
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            flex: 1,
-                                                            child: Center(
-                                                                child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .bar_chart_outlined)),
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                      "Vade Tarihi",
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .grey,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    )),
-                                                              ],
-                                                            ))),
-                                                        Expanded(
-                                                          flex: 4,
-                                                          child: Container(
-                                                            height: 60,
-                                                            decoration: BoxDecoration(
-                                                                border: Border.all(
-                                                                    color: Colors
-                                                                        .black)),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: <
-                                                                  Widget>[
-                                                                ListTile(
-                                                                  title: Text(
-                                                                      " ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}"),
-                                                                  trailing:
-                                                                      Icon(Icons
-                                                                          .calendar_today),
-                                                                  onTap:
-                                                                      _pickDate,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ), /*Container(
-                                                            decoration: BoxDecoration(
-                                                                border: Border.all(
-                                                                    color: Colors
-                                                                        .black)),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: <
-                                                                  Widget>[
-                                                                ListTile(
-                                                                  title: Text(
-                                                                      " ${pickedvad.year}, ${pickedvad.month}, ${pickedvad.day}"),
-                                                                  trailing:
-                                                                      Icon(Icons
-                                                                          .calendar_today),
-                                                                  onTap:
-                                                                      _pickDate(), //bunu degistri
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),*/
-                                                        ),
-                                                        Wdgfakebutton()
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          : Container(
-                                              child: Column(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            flex: 1,
-                                                            child: Center(
-                                                                child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .bar_chart_outlined)),
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                      "Tahsil edildiği tarih ve kasa hesabı",
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .grey,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    )),
-                                                              ],
-                                                            ))),
-                                                        Expanded(
-                                                          flex: 2,
-                                                          child: Container(
-                                                            height: 60,
-                                                            decoration: BoxDecoration(
-                                                                border: Border.all(
-                                                                    color: Colors
-                                                                        .black)),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: <
-                                                                  Widget>[
-                                                                ListTile(
-                                                                  title: Text(
-                                                                      " ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}"),
-                                                                  trailing:
-                                                                      Icon(Icons
-                                                                          .calendar_today),
-                                                                  onTap:
-                                                                      _pickDate,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Expanded(
-                                                            flex: 2,
-                                                            child:
-                                                                _dropdownbutton(
-                                                                    kasalist)
-                                                            /* Container(
+                                                  Expanded(
+                                                      flex: 2,
+                                                      child: _dropdownbutton(
+                                                          kasalist)
+                                                      /* Container(
                                                 decoration: BoxDecoration(
                                                   border: Border.all(),
                                                 ),
@@ -840,126 +872,125 @@ class _YenisatfatuiState extends State<Yenisatfatui> {
                                                   onChanged: (_) {},
                                                 ),
                                               ),*/
-                                                            ),
-                                                        Wdgfakebutton()
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            flex: 1,
-                                                            child: Center(
-                                                                child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .bar_chart_outlined)),
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                      "Tahsilat Açıklaması",
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .grey,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    )),
-                                                              ],
-                                                            ))),
-                                                        Expanded(
-                                                          flex: 4,
-                                                          child: Container(
-                                                            height: 45,
-                                                            child:
-                                                                TextFormField(
-                                                              onSaved: (s) {
-                                                                tahsacik =
-                                                                    s ?? "";
-                                                              },
-                                                              decoration:
-                                                                  const InputDecoration(
-                                                                      border:
-                                                                          OutlineInputBorder()),
-                                                              //         validator:
-                                                              //           (value) {
-                                                              // validation logic
-                                                              //     },
-                                                            ),
-                                                          ),
+                                                      ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 45,
+                                                        margin:
+                                                            EdgeInsets.all(20),
+                                                        child: FlatButton(
+                                                          child: Text(''),
+                                                          color: Colors.white,
+                                                          textColor:
+                                                              Colors.white,
+                                                          onPressed: () {},
                                                         ),
-                                                        Wdgfakebutton()
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Divider(),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            flex: 1,
-                                                            child: Center(
-                                                                child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .bar_chart_outlined)),
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                      "Düzenleme Tarihi",
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .grey,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    )),
-                                                              ],
-                                                            ))),
-                                                        Expanded(
-                                                          flex: 4,
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                border: Border.all(
-                                                                    color: Colors
-                                                                        .black)),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: <
-                                                                  Widget>[
-                                                                ListTile(
-                                                                  title: Text(
-                                                                      " ${pickedduztar.year}, ${pickedduztar.month}, ${pickedduztar.day}"),
-                                                                  trailing:
-                                                                      Icon(Icons
-                                                                          .calendar_today),
-                                                                  onTap:
-                                                                      _pickDate1,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
+                                                      ),
+                                                      Container(
+                                                        height: 45,
+                                                        margin:
+                                                            EdgeInsets.all(20),
+                                                        child: FlatButton(
+                                                          child: Text(''),
+                                                          color: Colors.white,
+                                                          textColor:
+                                                              Colors.white,
+                                                          onPressed: () {
+                                                            //kaydet işlemi yapp
+                                                          },
                                                         ),
-                                                        Wdgfakebutton()
-                                                      ],
-                                                    ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ],
                                               ),
                                             )
+                                          :
+                                          //     Divider(),
+                                          Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                      flex: 1,
+                                                      child: Center(
+                                                          child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                              flex: 1,
+                                                              child: Icon(Icons
+                                                                  .bar_chart_outlined)),
+                                                          Expanded(
+                                                              flex: 1,
+                                                              child: Text(
+                                                                "Ödeneceği Tarih",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              )),
+                                                        ],
+                                                      ))),
+                                                  Expanded(
+                                                    flex: 4,
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                              color: Colors
+                                                                  .black)),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          ListTile(
+                                                            title: Text(
+                                                                " ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}"),
+                                                            trailing: Icon(Icons
+                                                                .calendar_today),
+                                                            onTap: _pickDate1,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        height: 45,
+                                                        margin:
+                                                            EdgeInsets.all(20),
+                                                        child: FlatButton(
+                                                          child: Text(''),
+                                                          color: Colors.white,
+                                                          textColor:
+                                                              Colors.white,
+                                                          onPressed: () {},
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        height: 45,
+                                                        margin:
+                                                            EdgeInsets.all(20),
+                                                        child: FlatButton(
+                                                          child: Text(''),
+                                                          color: Colors.white,
+                                                          textColor:
+                                                              Colors.white,
+                                                          onPressed: () {
+                                                            //kaydet işlemi yapp
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                     ],
                                   ),
                                 ),

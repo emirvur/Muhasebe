@@ -1,3 +1,4 @@
+import 'package:Muhasebe/ui/musteriliste.dart';
 import 'package:Muhasebe/ui/satisfatlist.dart';
 import 'package:flutter/material.dart';
 
@@ -18,12 +19,13 @@ class _SatisbutonState extends State<Satisbuton> {
                     MaterialPageRoute(builder: (context) => Satisfatlist()));
               },
               child: Text("Faturalar")),
-          /* TextButton(
+          TextButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Satisfatlist()));
+                    MaterialPageRoute(builder: (context) => Musteriliste()));
               },
-              child: Text("Müşteriler")),
+              child: Text(
+                  "Müşteriler")), /*
           TextButton(
               onPressed: () {
                 Navigator.push(context,

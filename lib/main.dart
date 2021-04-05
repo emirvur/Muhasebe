@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:Muhasebe/ui/addproduct_ui.dart';
-import 'package:Muhasebe/ui/createpdf.dart';
+import 'package:Muhasebe/ui/gunceldurum.dart';
+import 'package:Muhasebe/utils/createpdf.dart';
 import 'package:Muhasebe/ui/dinamikui.dart';
 import 'package:Muhasebe/ui/giderbuton.dart';
 import 'package:Muhasebe/ui/kasalistesi.dart';
@@ -14,9 +15,34 @@ import 'package:Muhasebe/ui/stokgecmisiui.dart';
 import 'package:Muhasebe/ui/stokrapor.dart';
 import 'package:Muhasebe/ui/urunler_ui.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
-import 'package:Muhasebe/ui/yenisatisfatui.dart';
+import 'package:Muhasebe/ui/satfatrapor.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:vertical_navigation_bar/vertical_navigation_bar.dart';
+
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+/*
+var platformName = '';
+if (kIsWeb) {
+  platformName = "Web";
+} else {
+  if (Platform.isAndroid) {
+    platformName = "Android";
+  } else if (Platform.isIOS) {
+    platformName = "IOS";
+  } else if (Platform.isFuchsia) {
+    platformName = "Fuchsia";
+  } else if (Platform.isLinux) {
+    platformName = "Linux";
+  } else if (Platform.isMacOS) {
+    platformName = "MacOS";
+  } else if (Platform.isWindows) {
+    platformName = "Windows";
+  }
+}
+print("platformName :- "+platformName.toString())*/
 
 void main() {
   HttpOverrides.global = new MyHttpOverrides();
@@ -26,12 +52,13 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    initializeDateFormatting('tr');
     return MaterialApp(
       title: 'Vertical navigation bar demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: Gunceldurum(),
     );
   }
 }
@@ -45,39 +72,6 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-/*
-
-     drawer: Drawer(
-          child: ListView(
-        // Important: Remove any padding from the ListView.
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            child: Text('baslik kısmı'),
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-          ),
-          ListTile(
-            title: Text('onay beklenen siparislerim'),
-            onTap: () async {
-             
-            },
-          ),
-          ListTile(
-            title: Text('eski siparislerim'),
-            onTap: () {
-              // Update the state of the app
-              // ...
-              // Then close the drawer
-
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      )),
-
-*/
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();

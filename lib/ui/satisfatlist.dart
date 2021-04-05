@@ -6,6 +6,9 @@ import 'package:Muhasebe/ui/kasalistesi.dart';
 import 'package:Muhasebe/ui/product_detail_ui.dart';
 import 'package:Muhasebe/ui/satisfat_detay_ui.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
+import 'package:Muhasebe/ui/yenisatisfatui.dart';
+import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/wdgappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -22,6 +25,7 @@ class _SatisfatlistState extends State<Satisfatlist>
   bool _isloading = true;
   String dropdownValue = 'Filtrele';
   TextEditingController contara;
+  DateTime today = DateTime.now();
   @override
   void initState() {
     // TODO: implement initState
@@ -31,6 +35,7 @@ class _SatisfatlistState extends State<Satisfatlist>
       Future.delayed(Duration(seconds: 2), () {
         setState(() {
           lis = value;
+
           _isloading = false;
         });
       });
@@ -49,7 +54,19 @@ class _SatisfatlistState extends State<Satisfatlist>
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.grey.shade200,
+        appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.grey.shade300,
+            title: Wdgappbar("", "Satış Faturaları ", "Ahmet Seç")),
+        drawer: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors
+                .black87, //This will change the drawer background to blue.
+            //other styles
+          ),
+          child: Drawer(child: Wdgdrawer()),
+        ),
+        backgroundColor: Colors.grey.shade300,
         body: LoadingOverlay(
           isLoading: _isloading,
           opacity: 0,
@@ -70,56 +87,13 @@ class _SatisfatlistState extends State<Satisfatlist>
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => KasaListesiui()),
-                              );
-                            },
-                            child: Text(
-                              "Satış Faturaları",
-                              style: TextStyle(
-                                  fontSize: 24.0, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-
-                          //   SizedBox(
-                          //       width: 13,  ),
-                          Spacer(),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 24.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Yenikasaui()),
-                                );
-                              },
-                              child: Text(
-                                "Ahmet Seç",
-                                style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
                           Container(
                               height: 45,
                               decoration: BoxDecoration(
-                                  color: Colors.grey,
+                                  color: Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(color: Colors.black)),
                               child: DropdownButton<String>(
@@ -155,6 +129,7 @@ class _SatisfatlistState extends State<Satisfatlist>
                           ),
                           Expanded(
                             child: Container(
+                              color: Colors.grey.shade100,
                               height: 45,
                               child: TextField(
                                 controller: contara,
@@ -168,7 +143,7 @@ class _SatisfatlistState extends State<Satisfatlist>
                                           print("ilk setstateee");
                                           _isloading = true;
                                         });
-                                        var value = await APIServices.urunara(
+                                        var value = await APIServices.satfatara(
                                             contara.text);
                                         lis = value;
                                         print("apideee");
@@ -181,8 +156,8 @@ class _SatisfatlistState extends State<Satisfatlist>
                                       },
                                       child: Icon(Icons.search)),
                                   border: OutlineInputBorder(),
-                                  labelText: 'Ara',
-                                  hintText: 'Ara',
+                                  labelText: 'Ara...',
+                                  hintText: 'Ara...',
                                 ),
                               ),
                             ),
@@ -192,9 +167,41 @@ class _SatisfatlistState extends State<Satisfatlist>
                             margin: EdgeInsets.all(20),
                             child: FlatButton(
                               child: Text('Yeni Fatura oluştur'),
-                              color: Colors.grey,
+                              color: Colors.grey.shade700,
                               textColor: Colors.white,
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Yenisatfatui()),
+                                ).then((e) {
+                                  e != 1
+                                      ? print("gggg")
+                                      : APIServices.satfatal().then((value) {
+                                          Future.delayed(Duration(seconds: 1),
+                                              () {
+                                            setState(() {
+                                              lis = value;
+
+                                              //    _isloading = false;
+                                            });
+                                          });
+                                        });
+
+                                  // setState(() {
+                                  //   lis.add(e);
+                                  //     print(lis.length.toString());
+                                  //     });
+                                  /*         setState(() {
+                                    print("ee");
+                                    _isloading = true;
+                                  });
+                                  setState(() async {
+                                    await APIServices.urunal();
+                                    _isloading = false;
+                                  });*/
+                                });
+                              },
                             ),
                           ),
                         ],
@@ -203,61 +210,177 @@ class _SatisfatlistState extends State<Satisfatlist>
                     Container(
                         width: wsize,
                         child: DataTable(
-                            columns: const <DataColumn>[
+                            columns: <DataColumn>[
+                              DataColumn(
+                                label:
+                                    Checkbox(value: false, onChanged: (b) {}),
+                              ),
                               DataColumn(
                                 label: Text(
                                   'Fatura Açıklaması',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors
+                                          .grey //fontStyle: FontStyle.italic
+                                      ),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
                                   'Düzenleme Tarihi',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors
+                                          .grey //fontStyle: FontStyle.italic
+                                      ),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
                                   'Vade Tarihi',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors
+                                          .grey //fontStyle: FontStyle.italic
+                                      ),
                                 ),
                               ),
                               DataColumn(
-                                label: Text(
-                                  'Kalan Meblağ',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                label: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                    'Kalan Meblağ',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors
+                                            .teal //fontStyle: FontStyle.italic
+                                        ),
+                                  ),
                                 ),
                               ),
                             ],
                             rows: lis
-                                .map((e) => DataRow(cells: [
-                                      DataCell(InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      SatisfatDetailui(e)),
-                                            );
-                                          },
-                                          child:
-                                              Text(e.fataciklama.toString()))),
-                                      DataCell(Text(
-                                        e.duztarih.toString(),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                      DataCell(Text(
-                                        e.vadta.toString(),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                      DataCell(Text(
-                                        "${e.geneltoplam}",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                    ]))
+                                .map((e) => DataRow(
+                                        color: MaterialStateColor.resolveWith(
+                                            (states) => Colors.white),
+                                        cells: [
+                                          DataCell(Checkbox(
+                                            value: true,
+                                            onChanged: (b) {},
+                                          )),
+                                          DataCell(InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          SatisfatDetailui(e)),
+                                                ).then((e) {
+                                                  e != 1
+                                                      ? print("gggg")
+                                                      : APIServices.satfatal()
+                                                          .then((value) {
+                                                          Future.delayed(
+                                                              Duration(
+                                                                  seconds: 1),
+                                                              () {
+                                                            setState(() {
+                                                              lis = value;
+
+                                                              //    _isloading = false;
+                                                            });
+                                                          });
+                                                        });
+
+                                                  // setState(() {
+                                                  //   lis.add(e);
+                                                  //     print(lis.length.toString());
+                                                  //     });
+                                                  /*         setState(() {
+                                    print("ee");
+                                    _isloading = true;
+                                  });
+                                  setState(() async {
+                                    await APIServices.urunal();
+                                    _isloading = false;
+                                  });*/
+                                                });
+                                              },
+                                              child: Column(
+                                                children: [
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Text(
+                                                      e.fataciklama.toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 18),
+                                                    ),
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: Text(e.cariad,
+                                                        style: TextStyle(
+                                                            color: Colors.grey,
+                                                            fontSize: 15)),
+                                                  )
+                                                ],
+                                              ))),
+                                          DataCell(Text(e.duztarih.toString(),
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 15))),
+                                          DataCell(Column(
+                                            children: [
+                                              Text(
+                                                  e.vadta == "null"
+                                                      ? e.alta
+                                                      : e.vadta.toString(),
+                                                  style: TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: 15)),
+                                              /*       e.vadta != null
+                                                  ? Text(today
+                                                      .difference(
+                                                          DateTime.parse(
+                                                              e.vadta))
+                                                      .inDays
+                                                      .toString())
+                                                  : Text("")*/
+                                            ],
+                                          )),
+                                          DataCell(Column(
+                                            children: [
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Text(
+                                                    e.geneltoplam -
+                                                                e.alinmism !=
+                                                            0
+                                                        ? "${e.geneltoplam - e.alinmism}"
+                                                        : "Tahsil edildi",
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 18)),
+                                              ),
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Text(
+                                                    "Genel Toplam ${e.geneltoplam}",
+                                                    style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 15)),
+                                              ),
+                                            ],
+                                          )),
+                                        ]))
                                 .toList())),
                   ],
                 ),

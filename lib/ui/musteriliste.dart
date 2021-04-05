@@ -2,10 +2,13 @@ import 'package:Muhasebe/models/dtocarilist.dart';
 import 'package:Muhasebe/models/dtourun.dart';
 import 'package:Muhasebe/models/urun.dart';
 import 'package:Muhasebe/services/apiservices.dart';
-import 'package:Muhasebe/ui/addproduct_ui.dart';
+import 'package:Muhasebe/ui/musteridetay.dart';
+import 'package:Muhasebe/ui/yenimusteri.dart';
 import 'package:Muhasebe/ui/kasalistesi.dart';
 import 'package:Muhasebe/ui/product_detail_ui.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
+import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/wdgappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -49,7 +52,19 @@ class _MusterilisteState extends State<Musteriliste>
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.grey.shade200,
+        appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.grey.shade300,
+            title: Wdgappbar("Müşterileri", "", "Ahmet Seç")),
+        drawer: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors
+                .black87, //This will change the drawer background to blue.
+            //other styles
+          ),
+          child: Drawer(child: Wdgdrawer()),
+        ),
+        backgroundColor: Colors.grey.shade300,
         body: LoadingOverlay(
           isLoading: _isloading,
           opacity: 0,
@@ -70,56 +85,13 @@ class _MusterilisteState extends State<Musteriliste>
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => KasaListesiui()),
-                              );
-                            },
-                            child: Text(
-                              "Müşteriler",
-                              style: TextStyle(
-                                  fontSize: 24.0, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-
-                          //   SizedBox(
-                          //       width: 13,  ),
-                          Spacer(),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 24.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Yenikasaui()),
-                                );
-                              },
-                              child: Text(
-                                "Ahmet Seç",
-                                style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
                           Container(
                               height: 45,
                               decoration: BoxDecoration(
-                                  color: Colors.grey,
+                                  color: Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(color: Colors.black)),
                               child: DropdownButton<String>(
@@ -155,6 +127,7 @@ class _MusterilisteState extends State<Musteriliste>
                           ),
                           Expanded(
                             child: Container(
+                              color: Colors.grey.shade100,
                               height: 45,
                               child: TextField(
                                 controller: contara,
@@ -168,7 +141,7 @@ class _MusterilisteState extends State<Musteriliste>
                                           print("ilk setstateee");
                                           _isloading = true;
                                         });
-                                        var value = await APIServices.urunara(
+                                        var value = await APIServices.mustara(
                                             contara.text);
                                         lis = value;
                                         print("apideee");
@@ -181,8 +154,8 @@ class _MusterilisteState extends State<Musteriliste>
                                       },
                                       child: Icon(Icons.search)),
                                   border: OutlineInputBorder(),
-                                  labelText: 'Ara',
-                                  hintText: 'Ara',
+                                  labelText: 'Ara...',
+                                  hintText: 'Ara...',
                                 ),
                               ),
                             ),
@@ -192,13 +165,27 @@ class _MusterilisteState extends State<Musteriliste>
                             margin: EdgeInsets.all(20),
                             child: FlatButton(
                               child: Text('Yeni Müşteri Ekle'),
-                              color: Colors.grey,
+                              color: Colors.grey.shade700,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => AddProdForm()));
+                                        builder: (context) =>
+                                            Yenimusteri())).then((value) {
+                                  value == 1
+                                      ? APIServices.msuterial().then((value) {
+                                          Future.delayed(Duration(seconds: 1),
+                                              () {
+                                            setState(() {
+                                              print("aaaa");
+                                              lis = value;
+                                              //        _isloading = false;
+                                            });
+                                          });
+                                        })
+                                      : print("aa");
+                                });
                               },
                             ),
                           ),
@@ -208,39 +195,52 @@ class _MusterilisteState extends State<Musteriliste>
                     Container(
                         width: wsize,
                         child: DataTable(
-                            columns: const <DataColumn>[
+                            //       columnSpacing: 300,
+                            headingRowColor: MaterialStateColor.resolveWith(
+                                (states) => Colors.grey.shade200),
+                            columns: <DataColumn>[
+                              DataColumn(
+                                label:
+                                    Checkbox(value: false, onChanged: (b) {}),
+                              ),
                               DataColumn(
                                 label: Text(
                                   'Unvanı',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
                                   'Bakiye',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                  //     style: TextStyle(fontStyle: FontStyle.italic),
                                 ),
                               ),
                             ],
                             rows: lis
-                                .map((e) => DataRow(cells: [
-                                      DataCell(InkWell(
-                                          /*   onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProdDetailui(e)),
-                                            );
-                                          },*/
-                                          child:
-                                              Text(e.cariunvani.toString()))),
-                                      DataCell(Text(
-                                        e.bakiye.toString(),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                    ]))
+                                .map((e) => DataRow(
+                                        color: MaterialStateColor.resolveWith(
+                                            (states) => Colors.white),
+                                        cells: [
+                                          DataCell(Checkbox(
+                                            value: true,
+                                            onChanged: (b) {},
+                                          )),
+                                          DataCell(InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Musteridetay(e)),
+                                                );
+                                              },
+                                              child: Text(
+                                                  e.cariunvani.toString()))),
+                                          DataCell(Text(
+                                            e.bakiye.toString(),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          )),
+                                        ]))
                                 .toList())),
                   ],
                 ),

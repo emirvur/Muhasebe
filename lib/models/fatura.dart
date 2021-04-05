@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Fatura {
   int fatid;
   int fatTur;
@@ -53,6 +55,9 @@ class Fatura {
     this.cariId = map['cariId'];
     this.tahsid = map['tahsid'] ?? -1;
     this.duztarih = map['duztarih'];
+    var saat = DateFormat.jm('tr_TR').format(DateTime.parse(duztarih));
+    var yil = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(duztarih));
+    this.duztarih = yil + "-" + saat;
     this.katid = map['katid'];
     this.aratop = map['aratop'] ?? -1;
     this.araind = map['araind'] ?? -1;

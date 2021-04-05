@@ -35,6 +35,10 @@ dependencies:
   pdf: ^2.1.0
   excel: ^1.1.5
   syncfusion_flutter_xlsio: ^18.4.49-beta
+  fl_chart: ^0.12.3
+  charts_flutter: ^0.10.0
+  intl: ^0.16.1
+  
 
 dev_dependencies:
   flutter_test:

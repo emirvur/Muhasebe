@@ -1,4 +1,37 @@
+import 'dart:convert';
+
+import 'package:Muhasebe/models/urunhareket.dart';
+
+String siparisToJson(Postfatura data) => json.encode(data.toJson());
+
 class Postfatura {
+  Postfatura1 sipa;
+  List<Hareket> hareket;
+  Postfatura(this.sipa, this.hareket);
+
+  Map<String, dynamic> toJson() => {
+        "sipa": sipa.toMap(),
+        "hareket": List<dynamic>.from(hareket.map((x) => x.toJson())),
+      };
+}
+
+class Hareket {
+  Hareket({this.barkodno, this.miktar, this.brfiyat, this.vergi});
+
+  int barkodno;
+  int miktar;
+  num brfiyat;
+  num vergi;
+
+  Map<String, dynamic> toJson() => {
+        "barkodno": barkodno,
+        "miktar": miktar,
+        "brfiyat": brfiyat,
+        "vergi": vergi,
+      };
+}
+
+class Postfatura1 {
   int fatTur;
   String fataciklama;
   int cariId;
@@ -16,7 +49,7 @@ class Postfatura {
   String tahac;
   num alinm;
   num topm;
-  Postfatura(
+  Postfatura1(
     this.fatTur,
     this.fataciklama,
     this.cariId,

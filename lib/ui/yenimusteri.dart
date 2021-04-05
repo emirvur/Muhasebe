@@ -1,49 +1,28 @@
-import 'package:Muhasebe/models/dtourun.dart';
-import 'package:Muhasebe/models/urun.dart';
+import 'package:Muhasebe/models/cari.dart';
 import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
 import 'package:Muhasebe/utils/wdgfakebutton.dart';
 import 'package:flutter/material.dart';
 
-class AddProdForm extends StatefulWidget {
+class Yenimusteri extends StatefulWidget {
   @override
-  _AddProdFormState createState() => _AddProdFormState();
+  _YenimusteriState createState() => _YenimusteriState();
 }
-// stok takibi ve kritik stok seviyesinde validator yaz
-// //kaydettikten sonra flushbar çıksın
 
-class _AddProdFormState extends State<AddProdForm> {
+class _YenimusteriState extends State<Yenimusteri> {
   final _formKey = GlobalKey<FormState>();
   String dropstr = "Adet";
   String strkd = "%18";
-  bool stoktakipmi = true;
-  bool etkinmi = false;
-  String ad;
-  int bark;
-  num baslastkmi;
-  num kritist;
-  num vergharali;
-  num vergharsat;
-  TextEditingController contverdahal;
-  TextEditingController contverdahsat;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    contverdahal = TextEditingController(text: "0.0");
-    contverdahsat = TextEditingController(text: "0.0");
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    contverdahal.dispose();
-    contverdahsat.dispose();
-    super.dispose();
-  }
-
+  String firmunv;
+  String kisais;
+  String epos;
+  String tel;
+  String fak;
+  String iban;
+  String adres;
+  String tckn;
+  bool tuzelmi = true;
   @override
   Widget build(BuildContext context) {
     final wsize = MediaQuery.of(context).size.width;
@@ -52,7 +31,7 @@ class _AddProdFormState extends State<AddProdForm> {
           appBar: AppBar(
               elevation: 0,
               backgroundColor: Colors.grey.shade300,
-              title: Wdgappbar("Hizmet ve Ürünler >", "Yeni", "Ahmet Seç")),
+              title: Wdgappbar("Müşteriler >", "Yeni", "Ahmet Seç")),
           drawer: Theme(
             data: Theme.of(context).copyWith(
               canvasColor: Colors
@@ -96,7 +75,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                          "Adı",
+                                                          "Firma Unvanı",
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.grey,
@@ -112,17 +91,17 @@ class _AddProdFormState extends State<AddProdForm> {
                                                 height: 45,
                                                 child: TextFormField(
                                                   onSaved: (s) {
-                                                    ad = s;
+                                                    firmunv = s;
                                                   },
                                                   decoration: const InputDecoration(
                                                       border:
                                                           OutlineInputBorder()),
                                                   validator: (value) {
+                                                    // validation logic
                                                     if (value.isEmpty) {
-                                                      return "Ad kısmı boş olamaz";
+                                                      return "Firma Unvanı boş olamaz";
                                                     }
                                                     return null;
-                                                    // validation logic
                                                   },
                                                 ),
                                               ),
@@ -160,34 +139,25 @@ class _AddProdFormState extends State<AddProdForm> {
                                                           .validate()) {
                                                         _formKey.currentState
                                                             .save();
-
-                                                        num z = num.tryParse(
-                                                            strkd.substring(1));
-                                                        Urun ur = Urun(
-                                                            bark,
-                                                            ad,
+                                                        Cari car = Cari(
+                                                            -1,
+                                                            firmunv,
+                                                            kisais,
                                                             1,
-                                                            dropstr,
-                                                            baslastkmi ?? 0,
-                                                            kritist ?? -1,
-                                                            vergharali,
-                                                            vergharsat,
-                                                            z);
+                                                            epos,
+                                                            tel,
+                                                            fak,
+                                                            iban,
+                                                            adres,
+                                                            tuzelmi == true
+                                                                ? 0
+                                                                : 1,
+                                                            tckn,
+                                                            0);
                                                         await APIServices
-                                                            .urunekle(ur);
-                                                        Dtourun dur = Dtourun(
-                                                            bark,
-                                                            ad,
-                                                            1,
-                                                            "kategorisiz",
-                                                            dropstr,
-                                                            baslastkmi ?? 0,
-                                                            kritist ?? -1,
-                                                            vergharali,
-                                                            vergharsat,
-                                                            z);
+                                                            .musteriekle(car);
                                                         Navigator.of(context)
-                                                            .pop(dur);
+                                                            .pop(1);
                                                       }
                                                     },
                                                   ),
@@ -214,7 +184,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                          "Barkod Numarası",
+                                                          "Kısa İsim",
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.grey,
@@ -231,17 +201,17 @@ class _AddProdFormState extends State<AddProdForm> {
                                                 //   width: 45,
                                                 child: TextFormField(
                                                   onSaved: (s) {
-                                                    bark = num.tryParse(s);
+                                                    kisais = s;
                                                   },
                                                   decoration: const InputDecoration(
                                                       border:
                                                           OutlineInputBorder()),
                                                   validator: (value) {
+                                                    // validation logic
                                                     if (value.isEmpty) {
-                                                      return "Barkod numarası kısmı boş olamaz";
+                                                      return "Kısa isim boş olamaz";
                                                     }
                                                     return null;
-                                                    // validation logic
                                                   },
                                                 ),
                                               ),
@@ -290,7 +260,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                           ],
                                         ),
                                       ),
-                                      Padding(
+                                      /*     Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
                                           children: [
@@ -332,17 +302,38 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     );
                                                   }).toList(),
                                                   onChanged: (v) {
-                                                    print(
-                                                        "dropstr gunellendi mi");
-                                                    setState(() {
-                                                      dropstr = v;
-                                                    });
+                                                    dropstr = v;
                                                   },
                                                 )),
-                                            Wdgfakebutton()
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {},
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 45,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: FlatButton(
+                                                    child: Text(''),
+                                                    color: Colors.white,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      //kaydet işlemi yapp
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
-                                      ),
+                                      ),*/
                                       Divider(
                                         height: 20,
                                       ),
@@ -362,7 +353,199 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                          "Stok Takibi",
+                                                          "E-posta adresi",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                height: 45,
+                                                child: TextFormField(
+                                                  onSaved: (s) {
+                                                    epos = s;
+                                                  },
+                                                  //       initialValue: "0,0",
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                  validator: (value) {
+                                                    // validation logic
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Wdgfakebutton()
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Telefon Numarası",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                height: 45,
+                                                child: TextFormField(
+                                                  onSaved: (s) {
+                                                    tel = s;
+                                                  },
+                                                  //     initialValue: "0,0",
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                  validator: (value) {
+                                                    // validation logic
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Wdgfakebutton()
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Faks Numarası",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                height: 45,
+                                                child: TextFormField(
+                                                  onSaved: (s) {
+                                                    fak = s;
+                                                  },
+                                                  //     initialValue: "0,0",
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                  validator: (value) {
+                                                    // validation logic
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Wdgfakebutton()
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Iban Numarası",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        )),
+                                                  ],
+                                                ))),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Container(
+                                                height: 45,
+                                                child: TextFormField(
+                                                  onSaved: (s) {
+                                                    iban = s;
+                                                  },
+                                                  //     initialValue: "0,0",
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          OutlineInputBorder()),
+                                                  validator: (value) {
+                                                    // validation logic
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                            Wdgfakebutton()
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Center(
+                                                    child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Icon(Icons
+                                                            .bar_chart_outlined)),
+                                                    Expanded(
+                                                        flex: 1,
+                                                        child: Text(
+                                                          "Türü",
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.grey,
@@ -383,12 +566,11 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     controlAffinity:
                                                         ListTileControlAffinity
                                                             .leading,
-                                                    title: Text('YAPILSIN'),
-                                                    value: stoktakipmi,
+                                                    title: Text('Tüzel Kişi'),
+                                                    value: tuzelmi,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        stoktakipmi =
-                                                            !stoktakipmi;
+                                                        tuzelmi = !tuzelmi;
                                                       });
                                                     },
                                                   )),
@@ -404,12 +586,11 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     controlAffinity:
                                                         ListTileControlAffinity
                                                             .leading,
-                                                    title: Text('YAPILMASIN'),
-                                                    value: !stoktakipmi,
+                                                    title: Text('Gerçek Kişi'),
+                                                    value: !tuzelmi,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        stoktakipmi =
-                                                            !stoktakipmi;
+                                                        tuzelmi = !tuzelmi;
                                                       });
                                                     },
                                                   )),
@@ -418,218 +599,6 @@ class _AddProdFormState extends State<AddProdForm> {
                                           ],
                                         ),
                                       ),
-                                      Divider(
-                                        height: 20,
-                                      ),
-                                      stoktakipmi == true
-                                          ? Container(
-                                              child: Column(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            flex: 1,
-                                                            child: Center(
-                                                                child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .bar_chart_outlined)),
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                      "Başlangıç Stok Miktarı",
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .grey,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    )),
-                                                              ],
-                                                            ))),
-                                                        Expanded(
-                                                          flex: 4,
-                                                          child: Container(
-                                                            height: 45,
-                                                            child:
-                                                                TextFormField(
-                                                              onSaved: (s) {
-                                                                baslastkmi = num
-                                                                    .tryParse(
-                                                                        s);
-                                                              },
-                                                              initialValue:
-                                                                  "0,0",
-                                                              decoration:
-                                                                  const InputDecoration(
-                                                                      border:
-                                                                          OutlineInputBorder()),
-                                                              /*      validator:
-                                                                  (value) {
-
-                                                                // validation logic
-                                                              },*/
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Wdgfakebutton()
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            flex: 1,
-                                                            child: Center(
-                                                                child: Row(
-                                                              children: [
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .bar_chart_outlined)),
-                                                                Expanded(
-                                                                    flex: 1,
-                                                                    child: Text(
-                                                                      "Kritik Stok Uyarısı",
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .grey,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
-                                                                    )),
-                                                              ],
-                                                            ))),
-                                                        Expanded(
-                                                          flex: 4,
-                                                          child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  border: Border.all(
-                                                                      color: Colors
-                                                                          .black)),
-                                                              //     height: ,
-                                                              child:
-                                                                  CheckboxListTile(
-                                                                controlAffinity:
-                                                                    ListTileControlAffinity
-                                                                        .leading,
-                                                                title: Text(
-                                                                    'Etkinleştir'),
-                                                                value: etkinmi,
-                                                                onChanged:
-                                                                    (value) {
-                                                                  setState(() {
-                                                                    etkinmi =
-                                                                        !etkinmi;
-                                                                  });
-                                                                },
-                                                              )),
-                                                        ),
-                                                        Wdgfakebutton()
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  etkinmi == true
-                                                      ? Container(
-                                                          child: Column(
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        8.0),
-                                                                child: Row(
-                                                                  children: [
-                                                                    //        Expanded(  flex: 1,child: Icon(Icons.bar_chart_outlined)),
-                                                                    Expanded(
-                                                                        flex: 1,
-                                                                        child: Text(
-                                                                            "")),
-                                                                    Expanded(
-                                                                      flex: 4,
-                                                                      child:
-                                                                          Container(
-                                                                        //   height: 45,
-                                                                        child:
-                                                                            Row(
-                                                                          children: [
-                                                                            Container(
-                                                                              height: 45,
-                                                                              //  color: Colors.grey,
-                                                                              decoration: BoxDecoration(color: Colors.grey, border: Border.all(color: Colors.black)),
-                                                                              child: Center(
-                                                                                child: Text(
-                                                                                  "Kritik Stok Seviyesi",
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            Expanded(
-                                                                              child: Container(
-                                                                                height: 45,
-                                                                                child: TextFormField(
-                                                                                  onSaved: (s) {
-                                                                                    kritist = num.tryParse(s);
-                                                                                  },
-                                                                                  decoration: const InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.zero))),
-                                                                                  validator: (value) {
-                                                                                    // validation logic
-                                                                                  },
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    Wdgfakebutton()
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                              Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        8.0),
-                                                                child: Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                        flex: 1,
-                                                                        child: Text(
-                                                                            "")),
-                                                                    Expanded(
-                                                                        flex: 4,
-                                                                        child:
-                                                                            Text(
-                                                                          "Stok, belirttiğiniz seviyenin altına düştüğünde e-posta ve mobil uygulamamız aracılığı ile haberdar edilir, ürün liste ve sayfalarında kritik miktardaki ürünlerinizi görebilirsiniz.",
-                                                                          style: TextStyle(
-                                                                              fontSize: 14,
-                                                                              fontStyle: FontStyle.italic),
-                                                                        )),
-                                                                    Wdgfakebutton()
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        )
-                                                      : Text("")
-                                                ],
-                                              ),
-                                            )
-                                          : Text(""),
-                                      Divider(
-                                        color: Colors.black,
-                                      ),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -646,7 +615,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                          "Vergiler Hariç Alış Fiyatı",
+                                                          "Açık Adres",
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.grey,
@@ -661,26 +630,10 @@ class _AddProdFormState extends State<AddProdForm> {
                                               child: Container(
                                                 height: 45,
                                                 child: TextFormField(
-                                                  onChanged: (s) {
-                                                    setState(() {
-                                                      vergharali =
-                                                          num.tryParse(s);
-                                                      print(vergharali
-                                                          .toString());
-                                                      num t = num.tryParse(
-                                                          strkd.substring(1));
-
-                                                      print(t.toString());
-
-                                                      num y = vergharali +
-                                                          (vergharali *
-                                                              (t / 100));
-
-                                                      contverdahal.text =
-                                                          y.toString();
-                                                    });
+                                                  onSaved: (s) {
+                                                    adres = s;
                                                   },
-                                                  initialValue: "0,0",
+                                                  //     initialValue: "0,0",
                                                   decoration: const InputDecoration(
                                                       border:
                                                           OutlineInputBorder()),
@@ -694,6 +647,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                           ],
                                         ),
                                       ),
+                                      Divider(),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -710,7 +664,7 @@ class _AddProdFormState extends State<AddProdForm> {
                                                     Expanded(
                                                         flex: 1,
                                                         child: Text(
-                                                          "Vergiler Hariç Satış Fiyatı",
+                                                          "VKN/TCKN",
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.grey,
@@ -725,21 +679,10 @@ class _AddProdFormState extends State<AddProdForm> {
                                               child: Container(
                                                 height: 45,
                                                 child: TextFormField(
-                                                  onChanged: (s) {
-                                                    setState(() {
-                                                      vergharsat =
-                                                          num.tryParse(s);
-                                                      num t = num.tryParse(
-                                                          strkd.substring(1));
-                                                      num y = vergharsat +
-                                                          (vergharsat *
-                                                              (t / 100));
-
-                                                      contverdahsat.text =
-                                                          y.toString();
-                                                    });
+                                                  onSaved: (s) {
+                                                    tckn = s;
                                                   },
-                                                  initialValue: "0,0",
+                                                  //     initialValue: "0,0",
                                                   decoration: const InputDecoration(
                                                       border:
                                                           OutlineInputBorder()),
@@ -753,169 +696,8 @@ class _AddProdFormState extends State<AddProdForm> {
                                           ],
                                         ),
                                       ),
-                                      Divider(
-                                        color: Colors.black,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text(
-                                                          "KDV",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.grey,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                                flex: 4,
-                                                child: DropdownButton<String>(
-                                                  value: strkd,
-                                                  items: <String>[
-                                                    '%18',
-                                                    '%8',
-                                                    '%1',
-                                                  ].map((String value) {
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value: value,
-                                                      child: Text(value),
-                                                    );
-                                                  }).toList(),
-                                                  onChanged: (_) {
-                                                    setState(() {
-                                                      strkd = _;
 
-                                                      num t = num.tryParse(
-                                                          strkd.substring(1));
-                                                      num y = vergharsat +
-                                                          (vergharsat * t) %
-                                                              100;
-                                                      num z = vergharali +
-                                                          (vergharali * t) %
-                                                              100;
-
-                                                      contverdahsat.text =
-                                                          y.toString();
-                                                      contverdahal.text =
-                                                          z.toString();
-                                                    });
-                                                  },
-                                                )),
-                                            Wdgfakebutton()
-                                          ],
-                                        ),
-                                      ),
-                                      Divider(
-                                        color: Colors.black,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text(
-                                                          "Vergiler Dahil Alış Fiyatı",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.grey,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                              flex: 4,
-                                              child: Container(
-                                                height: 45,
-                                                child: TextFormField(
-                                                  controller: contverdahal,
-                                                  //   initialValue: "0,0",
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder()),
-                                                  validator: (value) {
-                                                    // validation logic
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Wdgfakebutton()
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text(
-                                                          "Vergiler Dahil Satış Fiyatı",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.grey,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                              flex: 4,
-                                              child: Container(
-                                                height: 45,
-                                                child: TextFormField(
-                                                  controller: contverdahsat,
-                                                  //      initialValue: "0,0",
-                                                  decoration: const InputDecoration(
-                                                      border:
-                                                          OutlineInputBorder()),
-                                                  validator: (value) {
-                                                    // validation logic
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Wdgfakebutton()
-                                          ],
-                                        ),
-                                      ),
+                                      // AÇILIŞ BAKİYE EKLE
                                     ],
                                   ),
                                 ),

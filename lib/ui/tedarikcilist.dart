@@ -1,30 +1,28 @@
-import 'package:Muhasebe/models/dtofatode.dart';
-import 'package:Muhasebe/models/dtofattahs.dart';
+import 'package:Muhasebe/models/dtocarilist.dart';
 import 'package:Muhasebe/models/dtourun.dart';
 import 'package:Muhasebe/models/urun.dart';
 import 'package:Muhasebe/services/apiservices.dart';
+import 'package:Muhasebe/ui/musteridetay.dart';
+import 'package:Muhasebe/ui/tedardetay.dart';
+import 'package:Muhasebe/ui/yenitedarikci.dart';
 import 'package:Muhasebe/ui/kasalistesi.dart';
 import 'package:Muhasebe/ui/product_detail_ui.dart';
-import 'package:Muhasebe/ui/satisfat_detay_ui.dart';
-import 'package:Muhasebe/ui/yenialisfat.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
-import 'alisdetayui.dart';
-
-class Alisfatlist extends StatefulWidget {
+class Tedarikciiste extends StatefulWidget {
   @override
-  _AlisfatlistState createState() => _AlisfatlistState();
+  _TedarikciisteState createState() => _TedarikciisteState();
 }
 
-class _AlisfatlistState extends State<Alisfatlist>
+class _TedarikciisteState extends State<Tedarikciiste>
     with AutomaticKeepAliveClientMixin {
   String selectedfilt = "test";
   List<String> lstr = ["Kategori", "Stok Durumu"];
-  List<Dtofatode> lis = [];
+  List<Dtocarilist> lis = [];
   bool _isloading = true;
   String dropdownValue = 'Filtrele';
   TextEditingController contara;
@@ -33,14 +31,11 @@ class _AlisfatlistState extends State<Alisfatlist>
     // TODO: implement initState
     super.initState();
     contara = TextEditingController();
-    APIServices.odefatal().then((value) {
-      Future.delayed(Duration(seconds: 1), () {
+    APIServices.tedaral().then((value) {
+      Future.delayed(Duration(seconds: 2), () {
         setState(() {
-          print("qqq");
           lis = value;
-          print("rrr");
           _isloading = false;
-          print("ccc");
         });
       });
     });
@@ -61,7 +56,7 @@ class _AlisfatlistState extends State<Alisfatlist>
         appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.grey.shade300,
-            title: Wdgappbar("", "Giderler", "Ahmet Seç")),
+            title: Wdgappbar(".. >", "..", "Ahmet Seç")),
         drawer: Theme(
           data: Theme.of(context).copyWith(
             canvasColor: Colors
@@ -91,7 +86,7 @@ class _AlisfatlistState extends State<Alisfatlist>
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
                           Container(
@@ -147,9 +142,8 @@ class _AlisfatlistState extends State<Alisfatlist>
                                           print("ilk setstateee");
                                           _isloading = true;
                                         });
-                                        var value =
-                                            await APIServices.alisfatara(
-                                                contara.text);
+                                        var value = await APIServices.tedara(
+                                            contara.text);
                                         lis = value;
                                         print("apideee");
                                         Future.delayed(
@@ -171,41 +165,29 @@ class _AlisfatlistState extends State<Alisfatlist>
                             height: 45,
                             margin: EdgeInsets.all(20),
                             child: FlatButton(
-                              child: Text('Detaylı Fatura oluştur'),
+                              child: Text('Yeni Tedarikçi Oluştur'),
                               color: Colors.grey.shade700,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Yenialisfatui()),
-                                ).then((e) {
-                                  e != 1
-                                      ? print("gggg")
-                                      : APIServices.odefatal().then((value) {
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Yenited()))
+                                    .then((value) {
+                                  value == 1
+                                      ? APIServices.tedaral().then((value) {
                                           Future.delayed(Duration(seconds: 1),
                                               () {
                                             setState(() {
+                                              print("aaaa");
                                               lis = value;
-
-                                              //    _isloading = false;
+                                              //        _isloading = false;
                                             });
                                           });
-                                        });
-
-                                  // setState(() {
-                                  //   lis.add(e);
-                                  //     print(lis.length.toString());
-                                  //     });
-                                  /*         setState(() {
-                                    print("ee");
-                                    _isloading = true;
-                                  });
-                                  setState(() async {
-                                    await APIServices.urunal();
-                                    _isloading = false;
-                                  });*/
+                                        })
+                                      : print("aa");
                                 });
+                                ;
                               },
                             ),
                           ),
@@ -215,6 +197,9 @@ class _AlisfatlistState extends State<Alisfatlist>
                     Container(
                         width: wsize,
                         child: DataTable(
+                            //       columnSpacing: 300,
+                            headingRowColor: MaterialStateColor.resolveWith(
+                                (states) => Colors.grey.shade200),
                             columns: <DataColumn>[
                               DataColumn(
                                 label:
@@ -222,38 +207,13 @@ class _AlisfatlistState extends State<Alisfatlist>
                               ),
                               DataColumn(
                                 label: Text(
-                                  'Fatura Açıklaması',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors
-                                          .grey //fontStyle: FontStyle.italic
-                                      ),
+                                  'Unvanı',
                                 ),
                               ),
                               DataColumn(
                                 label: Text(
-                                  'Düzenleme Tarihi',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors
-                                          .grey //fontStyle: FontStyle.italic
-                                      ),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text(
-                                    'Kalan Meblağ',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors
-                                            .teal //fontStyle: FontStyle.italic
-                                        ),
-                                  ),
+                                  'Bakiye',
+                                  //     style: TextStyle(fontStyle: FontStyle.italic),
                                 ),
                               ),
                             ],
@@ -267,80 +227,37 @@ class _AlisfatlistState extends State<Alisfatlist>
                                             onChanged: (b) {},
                                           )),
                                           DataCell(InkWell(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        AlisfatDetailui(e)),
-                                              ).then((e) {
-                                                e != 1
-                                                    ? print("gggg")
-                                                    : APIServices.odefatal()
-                                                        .then((value) {
-                                                        Future.delayed(
-                                                            Duration(
-                                                                seconds: 1),
-                                                            () {
-                                                          setState(() {
-                                                            lis = value;
-
-                                                            //    _isloading = false;
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Tedardetay(e)),
+                                                ).then((value) {
+                                                  value == 1
+                                                      ? APIServices.tedaral()
+                                                          .then((value) {
+                                                          Future.delayed(
+                                                              Duration(
+                                                                  seconds: 1),
+                                                              () {
+                                                            setState(() {
+                                                              print("aaaa");
+                                                              lis = value;
+                                                              //        _isloading = false;
+                                                            });
                                                           });
-                                                        });
-                                                      });
-
-                                                // setState(() {
-                                                //   lis.add(e);
-                                                //     print(lis.length.toString());
-                                                //     });
-                                                /*         setState(() {
-                                    print("ee");
-                                    _isloading = true;
-                                  });
-                                  setState(() async {
-                                    await APIServices.urunal();
-                                    _isloading = false;
-                                  });*/
-                                              });
-                                            },
-                                            child: Align(
-                                              alignment: Alignment.centerLeft,
+                                                        })
+                                                      : print("aa");
+                                                });
+                                                ;
+                                              },
                                               child: Text(
-                                                e.fataciklama.toString(),
-                                                style: TextStyle(fontSize: 18),
-                                              ),
-                                            ),
-                                          )),
-                                          DataCell(Text(e.duztarih.toString(),
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 15))),
-                                          DataCell(Column(
-                                            children: [
-                                              Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: Text(
-                                                    e.geneltoplam -
-                                                                e.odendimik !=
-                                                            0
-                                                        ? "${e.odendimik}"
-                                                        : "Ödendi",
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontSize: 15)),
-                                              ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: Text(
-                                                    "Genel Toplam ${e.geneltoplam}",
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontSize: 15)),
-                                              ),
-                                            ],
+                                                  e.cariunvani.toString()))),
+                                          DataCell(Text(
+                                            e.bakiye.toString(),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
                                           )),
                                         ]))
                                 .toList())),

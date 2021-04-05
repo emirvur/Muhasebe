@@ -1,4 +1,5 @@
 import 'package:Muhasebe/ui/satisfatlist.dart';
+import 'package:Muhasebe/ui/tedarikcilist.dart';
 import 'package:flutter/material.dart';
 
 import 'alisfatlist.dart';
@@ -26,6 +27,12 @@ class _GiderbutonState extends State<Giderbuton> {
                     MaterialPageRoute(builder: (context) => Alisfatlist()));
               },
               child: Text("Alış Faturalar")),
+          TextButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Tedarikciiste()));
+              },
+              child: Text("Tedarikçiler")),
           /* TextButton(
               onPressed: () {
                 Navigator.push(context,
