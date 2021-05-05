@@ -7,6 +7,7 @@ import 'package:Muhasebe/ui/product_detail_ui.dart';
 
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -47,10 +48,10 @@ class _StokraporuiState extends State<Stokraporui>
 
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
+        /*   appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.grey.shade300,
             title: Wdgappbar("", "Stoktaki Ürünler Raporu", "Ahmet Seç")),
@@ -61,27 +62,23 @@ class _StokraporuiState extends State<Stokraporui>
             //other styles
           ),
           child: Drawer(child: Wdgdrawer()),
-        ),
+        ),*/
         backgroundColor: Colors.grey.shade300,
         body: LoadingOverlay(
           isLoading: _isloading,
           opacity: 0,
-          progressIndicator: Center(
-            child: Column(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(
-                  height: 50,
-                ),
-                Text("Yükleniyor...")
-              ],
-            ),
-          ),
+          progressIndicator: Wdgloadingalert(wsize: wsize),
           child: Row(
             children: [
+              Container(
+                  color: Colors.black87,
+                  width: wsize.width / 5,
+                  //    height: 500,
+                  child: Wdgdrawer()),
               Expanded(
                 child: Column(
                   children: [
+                    Wdgappbar("wwww", "gggg", "qqqsw"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
@@ -174,7 +171,7 @@ class _StokraporuiState extends State<Stokraporui>
                       child: Container(
                         padding: EdgeInsets.all(8),
                         height: 70,
-                        width: wsize,
+                        width: wsize.width,
                         color: Colors.white,
                         child: Align(
                             alignment: Alignment.centerLeft,
@@ -190,7 +187,7 @@ class _StokraporuiState extends State<Stokraporui>
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
-                          width: wsize,
+                          width: wsize.width,
                           child: DataTable(
                               headingRowColor: MaterialStateColor.resolveWith(
                                   (states) => Colors.grey.shade200),

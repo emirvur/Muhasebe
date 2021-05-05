@@ -39,6 +39,7 @@ class Dtokasahar {
     this.netbakiye = map['netbakiye'];
     this.durum = map['durum'];
     this.miktar = map['miktar'] ?? -1;
+    this.alinmismik = map['alinmismik'] ?? -1;
     this.miktaraciklamasi = map['miktaraciklamasi'] ?? "null";
     this.tahsid = map['tahsid'] ?? -1;
     this.tediltar = map['tediltar'] ?? "null";

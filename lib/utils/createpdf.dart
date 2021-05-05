@@ -36,99 +36,69 @@ class _PDFSaveState extends State<PDFSave> {
     html.document.body.children.add(anchor);
   }
 
-/*
-  saveexcel() async {
-    /* excel.encode().then((onValue) {
-      File(join("Path_to_destination/excel.xlsx"))
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(onValue);
-    });*/
-    final Workbook workbook = new Workbook();
-//Accessing worksheet via index.
-    final Worksheet sheet = workbook.worksheets[0];
-//Setting value in the cell
-    sheet.getRangeByName('A1').setNumber(22);
-    sheet.getRangeByName('A2').setNumber(44);
-
-//Formula calculation is enabled for the sheet
-    sheet.enableSheetCalculations();
-
-//Setting formula in the cell
-    sheet.getRangeByName('A3').setFormula('=A1+A2');
-
-// Save the document.
-    List<int> bytes = workbook.saveAsStream();
-
-    final blob = html.Blob([bytes], 'application/excel');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    anchor1 = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = 'excel.xlsx';
-    html.document.body.children.add(anchor1);
-  }
-*/
-  createPDF() async {
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) => pw.Column(
-          children: [
-            pw.Row(children: [
-              pw.Text('Kale Anahtarcilik', style: pw.TextStyle(fontSize: 18)),
-              pw.Text(DateTime.now().toString(),
-                  style: pw.TextStyle(fontSize: 18)),
-            ]),
-            pw.Table(children: [
-              pw.TableRow(children: [
-                pw.Text(
-                  "Ürün adi",
-                  textScaleFactor: 1.5,
-                ),
-                pw.Text("Birim fiyat", textScaleFactor: 1.5),
-                pw.Text("Miktar", textScaleFactor: 1.5),
-                pw.Text("Vergi", textScaleFactor: 1.5),
-              ]),
-            ]),
-            pw.ListView.builder(
-              itemCount: widget.lis.length,
-              itemBuilder: (context, index) {
-                return pw.Table(children: [
-                  pw.TableRow(children: [
-                    pw.Text(widget.lis[index].ad, textScaleFactor: 1.5),
-                    pw.Text(widget.lis[index].brfiyat.toString(),
-                        textScaleFactor: 1.5),
-                    pw.Text(widget.lis[index].miktar.toString(),
-                        textScaleFactor: 1.5),
-                    pw.Text(widget.lis[index].vergi.toString(),
-                        textScaleFactor: 1.5),
-                  ]),
-                ]);
-              },
+  /*createPDF() async {
+    pdf.addPage(pw.Page(
+      build: (pw.Context context) => pw.Column(children: [
+        pw.Row(children: [
+          pw.Text('Buse Tekstil', style: pw.TextStyle(fontSize: 18)),
+          pw.Text(DateTime.now().toString(), style: pw.TextStyle(fontSize: 18)),
+        ]),
+        pw.Table(children: [
+          pw.TableRow(children: [
+            pw.Text(
+              "Ürün adi",
+              textScaleFactor: 1.5,
             ),
-          ],
+            pw.Text("Birim fiyat", textScaleFactor: 1.5),
+            pw.Text("Miktar", textScaleFactor: 1.5),
+            pw.Text("Vergi", textScaleFactor: 1.5),
+          ]),
+        ]),
+        pw.ListView.builder(
+          itemCount: widget.lis.length,
+          itemBuilder: (context, index) {
+            return pw.Table(children: [
+              pw.TableRow(children: [
+                pw.Text(widget.lis[index].ad, textScaleFactor: 1.5),
+                pw.Text(widget.lis[index].brfiyat.toString(),
+                    textScaleFactor: 1.5),
+                pw.Text(widget.lis[index].miktar.toString(),
+                    textScaleFactor: 1.5),
+                pw.Text(widget.lis[index].vergi.toString(),
+                    textScaleFactor: 1.5),
+              ]),
+            ]);
+          },
         ),
-      ),
-    );
+      ]),
+    ));
+    savePDF();
+  }*/
+
+  createPDF1() async {
+    pdf.addPage(pw.Page(
+        build: (pw.Context context) => pw.Column(children: [
+              pw.Row(children: [
+                pw.Text("Buse Tekstil"),
+                pw.Text(DateTime.now().toString())
+              ]),
+              pw.Table.fromTextArray(context: context, data: <List<String>>[
+                <String>['Urun Adi', 'Birim Fiyat', 'Miktar', 'Vergi'],
+                ...widget.lis.map((msg) => [
+                      msg.ad,
+                      msg.brfiyat.toString(),
+                      msg.miktar.toString(),
+                      msg.vergi.toString()
+                    ]),
+              ])
+            ])));
     savePDF();
   }
-
-  /* createexcel() {
-    excel = Excel.createExcel();
-    Sheet sheetObject = excel['SheetName'];
-
-    var cell = sheetObject.cell(CellIndex.indexByString("A1"));
-    cell.value = 8; // dynamic values support provided;
-
-    // printing cell-type
-    print("CellType: " + cell.cellType.toString());
-
-    sheetObject.insertColumn(8);
-  }*/
 
   @override
   void initState() {
     super.initState();
-    createPDF();
+    createPDF1();
     //  saveexcel();
   }
 

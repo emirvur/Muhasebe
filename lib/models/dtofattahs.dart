@@ -38,6 +38,7 @@ class Dtofattahs {
 
   Dtofattahs.fromMap(Map<String, dynamic> map) {
     // this.id = map['id'];
+    print("qq");
     this.fatid = map['fatid'];
     this.fatTur = map['fatTur'];
     this.durum = map['durum'];

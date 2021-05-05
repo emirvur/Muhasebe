@@ -70,7 +70,7 @@ class Dtofatode {
       this.odenmistar = yil2 + "-" + saat2;
     }
 
-    this.odendimik = map['odendimik'];
+    this.odendimik = map['odendimik'] ?? 0;
     this.odeid = map['odeid'];
   }
 }

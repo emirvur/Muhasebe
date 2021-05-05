@@ -4,11 +4,24 @@ import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/ui/addproduct_ui.dart';
 import 'package:Muhasebe/ui/kasalistesi.dart';
 import 'package:Muhasebe/ui/product_detail_ui.dart';
+import 'package:Muhasebe/ui/satfatrapor.dart';
+import 'package:Muhasebe/ui/satisfatlist.dart';
+import 'package:Muhasebe/ui/stokgecmisiui.dart';
+import 'package:Muhasebe/ui/stokrapor.dart';
+import 'package:Muhasebe/ui/tedarikcilist.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/excel.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
+
+import 'alfatrapor.dart';
+import 'alisfatlist.dart';
+import 'gunceldurum.dart';
+import 'irsaliyelist.dart';
+import 'musteriliste.dart';
 
 class UrunlerUi extends StatefulWidget {
   @override
@@ -18,7 +31,11 @@ class UrunlerUi extends StatefulWidget {
 class _UrunlerUiState extends State<UrunlerUi>
     with AutomaticKeepAliveClientMixin {
   String selectedfilt = "test";
-  List<String> lstr = ["Kategori", "Stok Durumu"];
+  List<String> lstr = [
+    "Kategori",
+    "Stok Durumu(Çoktan aza)",
+    "Stok Durumu(Azdan çoğa)"
+  ];
   List<Dtourun> lis = [];
   bool _isloading = true;
   String dropdownValue = 'Filtrele';
@@ -27,13 +44,12 @@ class _UrunlerUiState extends State<UrunlerUi>
   void initState() {
     // TODO: implement initState
     super.initState();
+    print("ewfsdds");
     contara = TextEditingController();
     APIServices.urunal().then((value) {
-      Future.delayed(Duration(seconds: 1), () {
-        setState(() {
-          lis = value;
-          _isloading = false;
-        });
+      setState(() {
+        lis = value;
+        _isloading = false;
       });
     });
   }
@@ -45,12 +61,42 @@ class _UrunlerUiState extends State<UrunlerUi>
     super.dispose();
   }
 
+  showAlertDialog(BuildContext context, List<int> bytes) {
+    AlertDialog alert = AlertDialog(
+      // title: Text("Simple Alert"),
+      content: Text("Excel dosyası indirme"),
+      actions: [
+        FlatButton(
+          child: Text("İptal"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        FlatButton(
+          child: Text("İndir"),
+          onPressed: () {
+            anchorexcel(bytes, "urun");
+            Navigator.of(context).pop();
+          },
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
+        /*  appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.grey.shade300,
             title: Wdgappbar("", "Hizmet ve Ürünler ", "Ahmet Seç")),
@@ -61,27 +107,23 @@ class _UrunlerUiState extends State<UrunlerUi>
             //other styles
           ),
           child: Drawer(child: Wdgdrawer()),
-        ),
+        ),*/
         backgroundColor: Colors.grey.shade300,
         body: LoadingOverlay(
           isLoading: _isloading,
           opacity: 0,
-          progressIndicator: Center(
-            child: Column(
-              children: [
-                Center(child: CircularProgressIndicator()),
-                SizedBox(
-                  height: 50,
-                ),
-                Text("Yükleniyor...")
-              ],
-            ),
-          ),
+          progressIndicator: Wdgloadingalert(wsize: wsize),
           child: Row(
             children: [
+              Container(
+                  color: Colors.black87,
+                  width: wsize.width / 5,
+                  //    height: 500,
+                  child: Wdgdrawer()),
               Expanded(
                 child: Column(
                   children: [
+                    Wdgappbar("wwww", "gggg", "qqqsw"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -104,14 +146,30 @@ class _UrunlerUiState extends State<UrunlerUi>
                                   color: Colors.deepPurpleAccent,
                                 ),*/
                                 onChanged: (String newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue;
-                                  });
+                                  if (newValue == 'Stok Durumu(Azdan çoğa)') {
+                                    APIServices.urunalazdancoga().then((value) {
+                                      setState(() {
+                                        dropdownValue = newValue;
+                                        lis = value;
+                                        _isloading = false;
+                                      });
+                                    });
+                                  } else if (newValue ==
+                                      'Stok Durumu(Çoktan aza)') {
+                                    APIServices.urunalcoktanaza().then((value) {
+                                      setState(() {
+                                        dropdownValue = newValue;
+                                        lis = value;
+                                        _isloading = false;
+                                      });
+                                    });
+                                  }
                                 },
                                 items: <String>[
                                   'Filtrele',
                                   'Kategori',
-                                  'Stok Durumu',
+                                  'Stok Durumu(Çoktan aza)',
+                                  'Stok Durumu(Azdan çoğa)'
                                   //  'Four'
                                 ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
@@ -194,104 +252,148 @@ class _UrunlerUiState extends State<UrunlerUi>
                         ],
                       ),
                     ),
-                    SingleChildScrollView(
-                      physics: ScrollPhysics(),
-                      child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4)),
-                          padding: const EdgeInsets.all(8.0),
-                          width: wsize,
-                          child: DataTable(
-                              //   showCheckboxColumn: true,
-                              //     dataRowHeight: 40,
-                              //     headingRowHeight: 60,
-                              //   headingRowColor: MaterialStateColor.resolveWith(
-                              //         (states) => Colors.blue),
-                              columns: <DataColumn>[
-                                DataColumn(
-                                  label:
-                                      Checkbox(value: false, onChanged: (b) {}),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    'Adı',
-                                    style: TextStyle(
-                                        color: Colors.teal, fontSize: 16),
-                                  ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    'Stok Miktarı',
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 16),
-                                  ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    'Alış(Vergiler Hariç)',
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 16),
-                                  ),
-                                ),
-                                DataColumn(
-                                  label: Text(
-                                    'Satış(Vergiler Hariç)',
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 16),
-                                  ),
-                                ),
-                              ],
-                              rows: lis
-                                  .map((e) => DataRow(
-                                          color: MaterialStateColor.resolveWith(
-                                              (states) => Colors.white),
-                                          cells: [
-                                            DataCell(Checkbox(
-                                              value: true,
-                                              onChanged: (b) {},
-                                            )),
-                                            DataCell(InkWell(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ProdDetailui(e)),
-                                                  );
-                                                },
-                                                child: Text(
-                                                  e.adi.toString(),
+                    Expanded(
+                      child: //Container(
+                          //     decoration: BoxDecoration(
+                          //       borderRadius: BorderRadius.circular(4)),
+                          // padding: const EdgeInsets.all(8.0),
+                          //width: wsize,
+                          //   height: 400,
+                          //  child:
+                          Scrollbar(
+                        isAlwaysShown: true,
+                        child: SingleChildScrollView(
+                          physics: ScrollPhysics(),
+                          child: Container(
+
+                              //  height: 300,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8)),
+                              padding: const EdgeInsets.all(8.0),
+                              width: wsize.width,
+                              child: DataTable(
+                                  //   showCheckboxColumn: true,
+                                  //     dataRowHeight: 40,
+                                  //     headingRowHeight: 60,
+                                  //   headingRowColor: MaterialStateColor.resolveWith(
+                                  //         (states) => Colors.blue),
+                                  columns: <DataColumn>[
+                                    /*     DataColumn(
+                                        label:
+                                            Checkbox(value: false, onChanged: (b) {}),
+                                      ),*/
+                                    DataColumn(
+                                      label: Text(
+                                        'Adı',
+                                        style: TextStyle(
+                                            color: Colors.teal, fontSize: 16),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Stok Miktarı',
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 16),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Alış(Vergiler Hariç)',
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 16),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Satış(Vergiler Hariç)',
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                  rows: lis
+                                      .map((e) => DataRow(
+                                              color: MaterialStateColor
+                                                  .resolveWith(
+                                                      (states) => Colors.white),
+                                              cells: [
+                                                /*   DataCell(Checkbox(
+                                                    value: true,
+                                                    onChanged: (b) {},
+                                                  )),*/
+                                                DataCell(InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                ProdDetailui(
+                                                                    e)),
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      e.adi.toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 16),
+                                                    ))),
+                                                DataCell(RichText(
+                                                  text: TextSpan(
+                                                    text: e.adet.toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 16),
+                                                    children: <TextSpan>[
+                                                      TextSpan(
+                                                          text: e.birim,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.grey)
+                                                          //       fontWeight:
+                                                          //              FontWeight.w300)
+                                                          ),
+                                                    ],
+                                                  ),
+                                                )),
+                                                DataCell(Text(
+                                                  e.verharal.toString(),
                                                   style:
                                                       TextStyle(fontSize: 16),
-                                                ))),
-                                            DataCell(RichText(
-                                              text: TextSpan(
-                                                text: e.adet.toString(),
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 16),
-                                                children: <TextSpan>[
-                                                  TextSpan(
-                                                      text: e.birim,
-                                                      style: TextStyle(
-                                                          color: Colors.grey)
-                                                      //       fontWeight:
-                                                      //              FontWeight.w300)
-                                                      ),
-                                                ],
-                                              ),
-                                            )),
-                                            DataCell(Text(
-                                              e.verharal.toString(),
-                                              style: TextStyle(fontSize: 16),
-                                            )),
-                                            DataCell(Text(
-                                              e.verharsat.toString(),
-                                              style: TextStyle(fontSize: 16),
-                                            )),
-                                          ]))
-                                  .toList())),
+                                                )),
+                                                DataCell(Text(
+                                                  e.verharsat.toString(),
+                                                  style:
+                                                      TextStyle(fontSize: 16),
+                                                )),
+                                              ]))
+                                      .toList())),
+                        ),
+                      ),
+                      //   ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: SizedBox(
+                          height: 50,
+                          child: TextButton.icon(
+                              style: TextButton.styleFrom(
+                                primary: Colors.white,
+                                backgroundColor: Colors.blueAccent,
+                                //   onSurface: Colors.pink,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isloading = true;
+                                });
+                                createexcel(lis).then((value) {
+                                  setState(() {
+                                    _isloading = false;
+                                  });
+                                  showAlertDialog(context, value);
+                                });
+                              },
+                              icon: Icon(Icons.import_export),
+                              label: Text("Excel'e Aktar"))),
+                    )
                   ],
                 ),
               )

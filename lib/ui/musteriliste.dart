@@ -8,7 +8,9 @@ import 'package:Muhasebe/ui/kasalistesi.dart';
 import 'package:Muhasebe/ui/product_detail_ui.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/createExcel.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -20,7 +22,7 @@ class Musteriliste extends StatefulWidget {
 class _MusterilisteState extends State<Musteriliste>
     with AutomaticKeepAliveClientMixin {
   String selectedfilt = "test";
-  List<String> lstr = ["Kategori", "Stok Durumu"];
+  List<String> lstr = ["Kategori", "Bakiye(Azdan çoğa)", "Bakiye(Çoktan aza)"];
   List<Dtocarilist> lis = [];
   bool _isloading = true;
   String dropdownValue = 'Filtrele';
@@ -31,7 +33,7 @@ class _MusterilisteState extends State<Musteriliste>
     super.initState();
     contara = TextEditingController();
     APIServices.msuterial().then((value) {
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           lis = value;
           _isloading = false;
@@ -49,10 +51,10 @@ class _MusterilisteState extends State<Musteriliste>
 
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
+        /*    appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.grey.shade300,
             title: Wdgappbar("Müşterileri", "", "Ahmet Seç")),
@@ -63,27 +65,23 @@ class _MusterilisteState extends State<Musteriliste>
             //other styles
           ),
           child: Drawer(child: Wdgdrawer()),
-        ),
+        ),*/
         backgroundColor: Colors.grey.shade300,
         body: LoadingOverlay(
           isLoading: _isloading,
           opacity: 0,
-          progressIndicator: Center(
-            child: Column(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(
-                  height: 50,
-                ),
-                Text("Yükleniyor...")
-              ],
-            ),
-          ),
+          progressIndicator: Wdgloadingalert(wsize: wsize),
           child: Row(
             children: [
+              Container(
+                  color: Colors.black87,
+                  width: wsize.width / 5,
+                  //    height: 500,
+                  child: Wdgdrawer()),
               Expanded(
                 child: Column(
                   children: [
+                    Wdgappbar("wwww", "gggg", "qqqsw"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -106,14 +104,34 @@ class _MusterilisteState extends State<Musteriliste>
                                   color: Colors.deepPurpleAccent,
                                 ),*/
                                 onChanged: (String newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue;
-                                  });
+                                  if (newValue == "Bakiye(Azdan çoğa)") {
+                                    APIServices.msuterialac().then((value) {
+                                      setState(() {
+                                        dropdownValue = newValue;
+                                        lis = value;
+                                        _isloading = false;
+                                      });
+                                    });
+                                  } else if (newValue == 'Bakiye(Çoktan aza)') {
+                                    APIServices.msuterialca().then((value) {
+                                      setState(() {
+                                        dropdownValue = newValue;
+                                        lis = value;
+                                        _isloading = false;
+                                      });
+                                    });
+                                  } else if (newValue == 'Kategori') {
+                                    /*    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PDFExcel(1, lis)));*/
+                                  }
                                 },
                                 items: <String>[
                                   'Filtrele',
                                   'Kategori',
-                                  'Stok Durumu',
+                                  "Bakiye(Azdan çoğa)", "Bakiye(Çoktan aza)"
                                   //  'Four'
                                 ].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
@@ -193,16 +211,16 @@ class _MusterilisteState extends State<Musteriliste>
                       ),
                     ),
                     Container(
-                        width: wsize,
+                        width: wsize.width,
                         child: DataTable(
                             //       columnSpacing: 300,
                             headingRowColor: MaterialStateColor.resolveWith(
                                 (states) => Colors.grey.shade200),
                             columns: <DataColumn>[
-                              DataColumn(
+                              /*   DataColumn(
                                 label:
                                     Checkbox(value: false, onChanged: (b) {}),
-                              ),
+                              ),*/
                               DataColumn(
                                 label: Text(
                                   'Unvanı',
@@ -220,10 +238,10 @@ class _MusterilisteState extends State<Musteriliste>
                                         color: MaterialStateColor.resolveWith(
                                             (states) => Colors.white),
                                         cells: [
-                                          DataCell(Checkbox(
+                                          /*  DataCell(Checkbox(
                                             value: true,
                                             onChanged: (b) {},
-                                          )),
+                                          )),*/
                                           DataCell(InkWell(
                                               onTap: () {
                                                 Navigator.push(

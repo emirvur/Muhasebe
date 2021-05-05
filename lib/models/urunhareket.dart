@@ -35,4 +35,13 @@ class Urunhareket {
     this.brfiyat = map['brfiyat'] ?? -1;
     this.vergi = map['vergi'] ?? -1;
   }
+  Urunhareket.fromIrsaliyeMap(Map<String, dynamic> map) {
+    // this.id = map['id'];
+    this.urharid = map['urharid'];
+    this.fatid = map['irsid'] ?? -1;
+    this.barkodno = map['barkodno'];
+    this.miktar = map['miktar'];
+    this.brfiyat = map['brfiyat'] ?? -1;
+    this.vergi = map['vergi'] ?? -1;
+  }
 }

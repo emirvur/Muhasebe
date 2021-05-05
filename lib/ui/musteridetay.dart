@@ -9,8 +9,13 @@ import 'package:Muhasebe/models/kasa.dart';
 import 'package:Muhasebe/models/tahsput.dart';
 import 'package:Muhasebe/models/urunhareket.dart';
 import 'package:Muhasebe/services/apiservices.dart';
+import 'package:Muhasebe/ui/musteritahsekle.dart';
+import 'package:Muhasebe/ui/satisfat_detay_ui.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/pdf.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgappbarfake.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -23,10 +28,11 @@ class Musteridetay extends StatefulWidget {
 
 class _MusteridetayState extends State<Musteridetay> {
   final _formKey = GlobalKey<FormState>();
-  List<Dtokasahar> lis = [];
+  List<Dtofattahs> lis = [];
   Cari cari;
   bool _isloading = true;
   bool tahsilform = false;
+  bool acikfat = false;
   DateTime selectedDate = DateTime.now();
   TextEditingController contar;
   bool isexpa = false;
@@ -53,14 +59,56 @@ class _MusteridetayState extends State<Musteridetay> {
       kasalist = value;
       kas = kasalist[0];
     });*/
-    APIServices.safcarial(widget.dt.cariId).then((value) {
-      Future.delayed(Duration(seconds: 2), () {
-        setState(() {
-          cari = value;
-          _isloading = false;
-        });
+    Future.wait([
+      APIServices.safcarial(widget.dt.cariId),
+      APIServices.satcarifatal(widget.dt.cariId),
+    ]).then((value) {
+      setState(() {
+        _isloading = false;
+        cari = value[0];
+        lis = value[1];
       });
     });
+    /*setState(() {
+  
+      APIServices.safcarial(widget.dt.cariId).then((value1) {
+        cari = value1;
+      });
+      APIServices.satcarifatal(widget.dt.cariId).then((value) {
+        lis = value;
+        _isloading = false;
+      });
+    });*/
+  }
+
+  showAlertDialog(BuildContext context, dynamic pdf) {
+    AlertDialog alert = AlertDialog(
+      // title: Text("Simple Alert"),
+      content: Text("Pdf dosyası indirme"),
+      actions: [
+        FlatButton(
+          child: Text("İptal"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        FlatButton(
+          child: Text("İndir"),
+          onPressed: () {
+            anchorpdf(pdf, "satisfat");
+            Navigator.of(context).pop();
+          },
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   @override
@@ -129,10 +177,10 @@ class _MusteridetayState extends State<Musteridetay> {
 
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
-            appBar: AppBar(
+            /*  appBar: AppBar(
                 elevation: 0,
                 backgroundColor: Colors.grey.shade300,
                 title: Wdgappbar("Müşteriler >", "Müşteri", "Ahmet Seç")),
@@ -143,91 +191,108 @@ class _MusteridetayState extends State<Musteridetay> {
                 //other styles
               ),
               child: Drawer(child: Wdgdrawer()),
-            ),
+            ),*/
             backgroundColor: Colors.grey.shade300,
             body: LoadingOverlay(
               isLoading: _isloading,
               opacity: 0,
-              progressIndicator: Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(
-                      height: 50,
-                    ),
-                    Text("Yükleniyor...")
-                  ],
-                ),
-              ),
-              child: SingleChildScrollView(
-                physics: ScrollPhysics(),
-                child: Column(
-                  children: [
-                    Row(
+              progressIndicator: Wdgloadingalert(wsize: wsize),
+              //   child: SingleChildScrollView(
+              //   physics: ScrollPhysics(),
+              // child: Column(
+              //children: [
+              child: Row(
+                children: [
+                  Container(
+                      color: Colors.black87,
+                      width: wsize.width / 5,
+                      //    height: 500,
+                      child: Wdgdrawer()),
+                  Expanded(
+                    flex: 78,
+                    child: Column(
                       children: [
-                        Expanded(
-                          flex: 78,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          //     Icon(Icons.),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0),
-                                            child: Text(
-                                              widget.dt.cariunvani,
-                                              style: TextStyle(
-                                                  fontSize: 24,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Row(
-                                            children: [
-                                              Chip(
-                                                  label: Text(widget.dt.katad)),
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                    border: Border.all()),
-                                                height: 45,
-                                                margin: EdgeInsets.all(20),
-                                                child: FlatButton(
-                                                  child: Text('Düzenle'),
-                                                  color: Colors.white,
-                                                  textColor: Colors.grey,
-                                                  onPressed: () {},
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                        Wdgappbar("wwww", "gggg", "qqqsw"),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    //     Icon(Icons.),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        widget.dt.cariunvani,
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold),
                                       ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                              child: Row(
-                                            children: [
-                                              Icon(Icons.call),
-                                              Text(cari.telno),
-                                            ],
-                                          )),
-                                          Expanded(
-                                              child: Row(
-                                            children: [
-                                              Icon(Icons.mail),
-                                              Text(cari.eposta),
-                                            ],
-                                          )),
-                                          Expanded(
+                                    ),
+                                    Spacer(),
+                                    Row(
+                                      children: [
+                                        Chip(label: Text(widget.dt.katad)),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all()),
+                                          height: 45,
+                                          margin: EdgeInsets.all(20),
+                                          child: FlatButton(
+                                            child: Text('Düzenle'),
+                                            color: Colors.white,
+                                            textColor: Colors.grey,
+                                            onPressed: () {
+                                              APIServices.satcariacikfatal(
+                                                      widget.dt.cariId)
+                                                  .then((value) {
+                                                setState(() {
+                                                  acikfat = true;
+                                                  lis = value;
+                                                });
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.call),
+                                            Text(
+                                                cari == null ? "" : cari.telno),
+                                          ],
+                                        )),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.mail),
+                                            Text(cari == null
+                                                ? ""
+                                                : cari.eposta),
+                                          ],
+                                        )),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.location_city),
+                                            Text(
+                                                cari == null ? "" : cari.adres),
+                                          ],
+                                        )),
+                                    /*  Expanded(
                                             child: ExpansionPanelList(
                                               expansionCallback:
                                                   (int index, bool isExpanded) {
@@ -250,25 +315,51 @@ class _MusteridetayState extends State<Musteridetay> {
                                                       Align(
                                                           alignment: Alignment
                                                               .centerLeft,
-                                                          child:
-                                                              Text(cari.adres)),
+                                                          child: Text(cari ==
+                                                                  null
+                                                              ? ""
+                                                              : cari.adres)),
                                                       Divider(),
                                                       Align(
                                                           alignment: Alignment
                                                               .centerLeft,
-                                                          child:
-                                                              Text(cari.tckn)),
+                                                          child: Text(
+                                                              cari == null
+                                                                  ? ""
+                                                                  : cari.tckn)),
                                                     ],
                                                   ),
                                                   isExpanded: isexpa,
                                                 ),
                                               ],
                                             ),
-                                          ),
+                                          ),*/
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Row(children: [
+                                  Expanded(
+                                      flex: 1,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.account_balance),
+                                          Text(cari == null ? "" : cari.iban),
                                         ],
-                                      ),
-                                      Divider(),
-                                      /*    Row(
+                                      )),
+                                  Expanded(
+                                      flex: 1,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.message),
+                                          Text(cari == null ? "" : cari.faks),
+                                        ],
+                                      )),
+                                  Expanded(flex: 1, child: Text("")),
+                                ]),
+                                Divider(),
+                                /*    Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
@@ -280,468 +371,599 @@ class _MusteridetayState extends State<Musteridetay> {
                                         ],
                                       ),
                                       Divider(),*/
-                                      Container(
-                                          width: wsize,
-                                          child: DataTable(
-                                              headingRowColor:
-                                                  MaterialStateColor
-                                                      .resolveWith((states) =>
-                                                          Colors.grey.shade200),
-                                              columns: const <DataColumn>[
-                                                DataColumn(
-                                                  label: Text(
-                                                    'İşlem Türü',
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                Container(
+                                    width: wsize.width,
+                                    child: DataTable(
+                                        columns: <DataColumn>[
+                                          /*       DataColumn(
+                                            label: Checkbox(
+                                                value: false,
+                                                onChanged: (b) {}),
+                                          ),*/
+                                          DataColumn(
+                                            label: Text(
+                                              acikfat == false
+                                                  ? 'Fatura Açıklaması'
+                                                  : "Açık Faturalar",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors
+                                                      .grey //fontStyle: FontStyle.italic
                                                   ),
-                                                ),
-                                                DataColumn(
-                                                  label: Text(
-                                                    'İşlem  Tarihi',
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Düzenleme Tarihi',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors
+                                                      .grey //fontStyle: FontStyle.italic
                                                   ),
-                                                ),
-                                                DataColumn(
-                                                  label: Text(
-                                                    'İlgili Hesap',
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Text(
+                                              'Vade Tarihi',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors
+                                                      .grey //fontStyle: FontStyle.italic
                                                   ),
-                                                ),
-                                                DataColumn(
-                                                  label: Text(
-                                                    'Açıklama',
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
-                                                DataColumn(
-                                                  label: Text(
-                                                    'Meblağ',
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
-                                                DataColumn(
-                                                  label: Text(
-                                                    'Bakiye',
-                                                    style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ),
-                                              ],
-                                              rows: lis
-                                                  .map((e) => DataRow(cells: [
-                                                        DataCell(Text(e.durum
-                                                            .toString())),
-                                                        DataCell(Text(
-                                                          e.durum == 0
-                                                              ? e.tediltar
-                                                                  .toString()
-                                                              : e.durum == 1
-                                                                  ? e.odenmistar
-                                                                  : "",
+                                            ),
+                                          ),
+                                          DataColumn(
+                                            label: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                'Kalan Meblağ',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors
+                                                        .teal //fontStyle: FontStyle.italic
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        rows: lis
+                                            .map((e) => DataRow(
+                                                    color: MaterialStateColor
+                                                        .resolveWith((states) =>
+                                                            Colors.white),
+                                                    cells: [
+                                                      /*  DataCell(Checkbox(
+                                                        value: true,
+                                                        onChanged: (b) {},
+                                                      )),*/
+                                                      DataCell(InkWell(
+                                                          onTap: () {
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      SatisfatDetailui(
+                                                                          e)),
+                                                            ).then((e) {
+                                                              e != 1
+                                                                  ? print(
+                                                                      "gggg")
+                                                                  : APIServices
+                                                                          .satfatal()
+                                                                      .then(
+                                                                          (value) {
+                                                                      Future.delayed(
+                                                                          Duration(
+                                                                              seconds: 1),
+                                                                          () {
+                                                                        setState(
+                                                                            () {
+                                                                          lis =
+                                                                              value;
+
+                                                                          //    _isloading = false;
+                                                                        });
+                                                                      });
+                                                                    });
+
+                                                              // setState(() {
+                                                              //   lis.add(e);
+                                                              //     print(lis.length.toString());
+                                                              //     });
+                                                              /*         setState(() {
+                                        print("ee");
+                                        _isloading = true;
+                                      });
+                                      setState(() async {
+                                        await APIServices.urunal();
+                                        _isloading = false;
+                                      });*/
+                                                            });
+                                                          },
+                                                          child: Column(
+                                                            children: [
+                                                              Align(
+                                                                alignment: Alignment
+                                                                    .centerLeft,
+                                                                child: Text(
+                                                                  e.fataciklama
+                                                                      .toString(),
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          18),
+                                                                ),
+                                                              ),
+                                                              Align(
+                                                                alignment: Alignment
+                                                                    .centerLeft,
+                                                                child: Text(
+                                                                    e.cariad,
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .grey,
+                                                                        fontSize:
+                                                                            15)),
+                                                              )
+                                                            ],
+                                                          ))),
+                                                      DataCell(Text(
+                                                          e.duztarih.toString(),
                                                           style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )),
-                                                        DataCell(Text(
-                                                          "",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )),
-                                                        DataCell(Text(
-                                                          e.durum == 0
-                                                              ? e.tahsaciklama
-                                                                  .toString()
-                                                              : e.durum == 1
-                                                                  ? e.odaciklama
-                                                                  : e.miktaraciklamasi,
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )),
-                                                        DataCell(
-                                                          Text(e.durum == 0
-                                                              ? e.alinmismik
-                                                                  .toString()
-                                                              : e.durum == 1
-                                                                  ? e.odendimik
-                                                                  : e.miktar
-                                                                      .toString()),
-                                                        ),
-                                                        DataCell(Text(e
-                                                            .netbakiye
-                                                            .toString())),
-                                                      ]))
-                                                  .toList())),
-                                      Divider(),
-                                    ],
-                                  ),
-                                  //     color: Colors.white,
-                                ),
-                              ),
-                            ],
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontSize: 15))),
+                                                      DataCell(Column(
+                                                        children: [
+                                                          Text(
+                                                              e.vadta == "null"
+                                                                  ? e.alta
+                                                                  : e.vadta
+                                                                      .toString(),
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .grey,
+                                                                  fontSize:
+                                                                      15)),
+                                                          /*       e.vadta != null
+                                                      ? Text(today
+                                                          .difference(
+                                                              DateTime.parse(
+                                                                  e.vadta))
+                                                          .inDays
+                                                          .toString())
+                                                      : Text("")*/
+                                                        ],
+                                                      )),
+                                                      DataCell(Column(
+                                                        children: [
+                                                          Align(
+                                                            alignment: Alignment
+                                                                .centerRight,
+                                                            child: Text(
+                                                                e.geneltoplam -
+                                                                            e
+                                                                                .alinmism !=
+                                                                        0
+                                                                    ? "${e.geneltoplam - e.alinmism}"
+                                                                    : "Tahsil edildi",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        18)),
+                                                          ),
+                                                          Align(
+                                                            alignment: Alignment
+                                                                .centerRight,
+                                                            child: Text(
+                                                                "Genel Toplam ${e.geneltoplam}",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    fontSize:
+                                                                        15)),
+                                                          ),
+                                                        ],
+                                                      )),
+                                                    ]))
+                                            .toList())),
+                                Divider(),
+                              ],
+                            ),
+                            //     color: Colors.white,
                           ),
                         ),
-                        Expanded(
-                            flex: 22,
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                            child: _dropdownbutton(kasalist)),
-                                        /*     Expanded(
-                                          child: Container(
-                                            //   height: 45,
-                                            margin: EdgeInsets.all(5),
-                                            child: FlatButton(
-                                              child: Text('Ödeme'),
-                                              color: Colors.grey.shade500,
-                                              textColor: Colors.brown,
-                                              onPressed: () {},
-                                            ),
-                                          ),
-                                        ),*/
-                                        Expanded(
-                                          child: Container(
-                                            //   height: 45,
-                                            margin: EdgeInsets.all(5),
-                                            child: FlatButton(
-                                              child: Text('Tahsilat Ekle'),
-                                              color: Colors.blue,
-                                              textColor: Colors.white,
-                                              onPressed: () {},
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "Bakiye",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18),
-                                          ),
-                                          Text(widget.dt.bakiye.toString(),
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18))
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        //   height: 45,
-                                        margin: EdgeInsets.all(5),
-                                        child: FlatButton(
-                                          child: Text('Ekstre Gönder'),
-                                          color: Colors.blue,
-                                          textColor: Colors.white,
-                                          onPressed: () {},
-                                        ),
-                                      ),
-                                    ),
-
-                                    /*  Container(
-                                      width: wsize / 5,
-                                      decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        //     borderRadius: BorderRadius.circular(10)
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Icon(Icons.enhanced_encryption),
-                                              Text(
-                                                  "Tahsil Edildi   ${widget.dt.alinmism} TL"),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              FlatButton(
-                                                child: Text('Vazgeç'),
-                                                color: Colors.blueAccent,
-                                                textColor: Colors.white,
-                                                onPressed: () {
-                                                  setState(() {
-                                                    print("nn");
-                                                    tahsilform = false;
-                                                  });
-                                                },
-                                              ),
-                                              FlatButton(
-                                                child: Text('Tahsilat Ekle'),
-                                                color: widget.dt.durum == 0
-                                                    ? Colors.blueAccent
-                                                    : Colors.grey,
-                                                textColor: Colors.white,
-                                                onPressed: () {
-                                                  widget.dt.durum == 1
-                                                      ? {}
-                                                      : setState(() {
-                                                          print("nn");
-                                                          contar.text =
-                                                              selectedDate.toString();
-                                                          tahsilform = true;
-                                                        });
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          tahsilform == false
-                                              ? Text("")
-                                              : Column(
-                                                  children: [
-                                                    Center(
-                                                      child: Text("Tahsilat Ekle"),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(8.0),
-                                                      child: Row(
-                                                        children: [
-                                                          Expanded(
-                                                              flex: 1,
-                                                              child: InkWell(
-                                                                  onTap: () async {
-                                                                    await _selectDate(
-                                                                        context);
-                                                                  },
-                                                                  child: Text(
-                                                                      "Tarih*"))),
-                                                          Expanded(
-                                                            flex: 4,
-                                                            child: Container(
-                                                              height: 45,
-                                                              child: TextFormField(
-                                                                controller: contar,
-                                                                decoration:
-                                                                    const InputDecoration(
-                                                                        border:
-                                                                            OutlineInputBorder()),
-                                                                validator: (value) {
-                                                                  // validation logic
-                                                                },
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(8.0),
-                                                      child: Row(
-                                                        children: [
-                                                          Expanded(
-                                                              flex: 1,
-                                                              child: Text("Hesap*")),
-                                                          Expanded(
-                                                              flex: 4,
-                                                              child: _dropdownbutton(
-                                                                  kasalist)
-                                                              /* Container(
-                                                              height: 45,
-                                                              child: TextFormField(
-                                                                decoration:
-                                                                    const InputDecoration(
-                                                                        border:
-                                                                            OutlineInputBorder()),
-                                                                validator: (value) {
-                                                                  // validation logic
-                                                                },
-                                                              ),
-                                                            ),*/
-                                                              ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(8.0),
-                                                      child: Row(
-                                                        children: [
-                                                          Expanded(
-                                                              flex: 1,
-                                                              child: Text("Meblağ*")),
-                                                          Expanded(
-                                                            flex: 4,
-                                                            child: Container(
-                                                              height: 45,
-                                                              child: TextFormField(
-                                                                controller: condeg,
-                                                                //         initialValue:
-                                                                //               " ${widget.dt.geneltoplam - widget.dt.alinmism}",
-                                                                decoration:
-                                                                    const InputDecoration(
-                                                                        border:
-                                                                            OutlineInputBorder()),
-                                                                validator: (value) {
-                                                                  var x =
-                                                                      num.tryParse(
-                                                                          value);
-                                                                  if (x == null) {
-                                                                    return "Lütfen geçerli bir sayı giriniz";
-                                                                  }
-                                                                  return null;
-
-                                                                  // validation logic
-                                                                },
-                                                                onSaved: (v) {
-                                                                  var x =
-                                                                      num.tryParse(v);
-
-                                                                  deger = x;
-                                                                },
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(8.0),
-                                                      child: Row(
-                                                        children: [
-                                                          Expanded(
-                                                              flex: 1,
-                                                              child:
-                                                                  Text("Açıklama*")),
-                                                          Expanded(
-                                                            flex: 4,
-                                                            child: Container(
-                                                              height: 45,
-                                                              child: TextFormField(
-                                                                controller: conacik,
-                                                                decoration:
-                                                                    const InputDecoration(
-                                                                        border:
-                                                                            OutlineInputBorder()),
-                                                                validator: (value) {
-                                                                  // validation logic
-                                                                },
-                                                                onSaved: (v) {
-                                                                  acikla = v;
-                                                                },
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    TextButton(
-                                                        onPressed: () async {
-                                                          /*       if (_formKey.currentState
-                                                              .validate()) {
-                                                            _formKey.currentState
-                                                                .save();
-                                                          }*/
-                                                          //         _formKey.currentState
-                                                          //               .save();
-                                                          num x = num.tryParse(
-                                                              condeg.text);
-                                                          Tahsput tp = Tahsput(
-                                                              widget.dt.tahsid,
-                                                              x,
-                                                              widget.dt.geneltoplam,
-                                                              selectedDate.toString(),
-                                                              kas.kasaid,
-                                                              conacik.text);
-                                                          bool b = await APIServices
-                                                              .tahsharguncelle(tp);
-                                                          print(b.toString());
-                                                        },
-                                                        child: Text("Tahsilat Ekle"))
-                                                  ],
-                                                ),
-                                        ],
-                                      ),
-                                    ),*/
-                                    /*    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Container(
-                                      width: wsize / 5,
-                                      decoration: BoxDecoration(
-                                        color: Colors.amberAccent,
-                                        //     borderRadius: BorderRadius.circular(10)
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              "Fatura Geçmişi",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16),
-                                            ),
-                                          ),
-                                          ListTile(
-                                            leading: Icon(Icons.keyboard_arrow_down),
-                                            title: Text("Fatura Güncellendi"),
-                                            subtitle: Text("03 Şubat 2020"),
-                                          ),
-                                          Divider(),
-                                          ListTile(
-                                            leading: Icon(Icons.keyboard_arrow_down),
-                                            title: Text("Fatura Güncellendi"),
-                                            subtitle: Text("03 Şubat 2020"),
-                                          ),
-                                          Divider(),
-                                          ListTile(
-                                            leading: Icon(Icons.keyboard_arrow_down),
-                                            title: Text("Fatura Güncellendi"),
-                                            subtitle: Text("03 Şubat 2020"),
-                                          )
-                                        ],
-                                      ),
-                                    )*/
-                                  ],
-                                ),
-                              ),
-                            )),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                      flex: 22,
+                      child: Column(
+                        children: [
+                          Wdgappbarfake(),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Column(
+                                children: [
+                                  Wdgappbarfake(),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          child: _dropdownbutton(kasalist)),
+                                      /*     Expanded(
+                                              child: Container(
+                                                //   height: 45,
+                                                margin: EdgeInsets.all(5),
+                                                child: FlatButton(
+                                                  child: Text('Ödeme'),
+                                                  color: Colors.grey.shade500,
+                                                  textColor: Colors.brown,
+                                                  onPressed: () {},
+                                                ),
+                                              ),
+                                            ),*/
+                                      Expanded(
+                                        child: Container(
+                                          //   height: 45,
+                                          margin: EdgeInsets.all(5),
+                                          child: FlatButton(
+                                            child: Text('Tahsilat Ekle'),
+                                            color: Colors.blue,
+                                            textColor: Colors.white,
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Mustahsekle(
+                                                              widget.dt.cariId,
+                                                              widget.dt
+                                                                  .cariunvani)));
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Bakiye",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                        Text(widget.dt.bakiye.toString(),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18))
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      //   height: 45,
+                                      margin: EdgeInsets.all(5),
+                                      child: FlatButton(
+                                        child: Text('Ekstre Gönder'),
+                                        color: Colors.blue,
+                                        textColor: Colors.white,
+                                        onPressed: () {},
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      //   height: 45,
+                                      margin: EdgeInsets.all(5),
+                                      child: FlatButton(
+                                        child: Text('Ekstre Pdf indir'),
+                                        color: Colors.blue,
+                                        textColor: Colors.white,
+                                        onPressed: () {
+                                          setState(() {
+                                            _isloading = true;
+                                          });
+                                          createPDF1(widget.dt.cariunvani, "",
+                                                  widget.dt, lis)
+                                              .then((value) {
+                                            setState(() {
+                                              _isloading = false;
+                                            });
+                                            showAlertDialog(context, value);
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  )
+
+                                  /*  Container(
+                                          width: wsize / 5,
+                                          decoration: BoxDecoration(
+                                            color: Colors.green,
+                                            //     borderRadius: BorderRadius.circular(10)
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  Icon(Icons.enhanced_encryption),
+                                                  Text(
+                                                      "Tahsil Edildi   ${widget.dt.alinmism} TL"),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  FlatButton(
+                                                    child: Text('Vazgeç'),
+                                                    color: Colors.blueAccent,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        print("nn");
+                                                        tahsilform = false;
+                                                      });
+                                                    },
+                                                  ),
+                                                  FlatButton(
+                                                    child: Text('Tahsilat Ekle'),
+                                                    color: widget.dt.durum == 0
+                                                        ? Colors.blueAccent
+                                                        : Colors.grey,
+                                                    textColor: Colors.white,
+                                                    onPressed: () {
+                                                      widget.dt.durum == 1
+                                                          ? {}
+                                                          : setState(() {
+                                                              print("nn");
+                                                              contar.text =
+                                                                  selectedDate.toString();
+                                                              tahsilform = true;
+                                                            });
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                              tahsilform == false
+                                                  ? Text("")
+                                                  : Column(
+                                                      children: [
+                                                        Center(
+                                                          child: Text("Tahsilat Ekle"),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.all(8.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Expanded(
+                                                                  flex: 1,
+                                                                  child: InkWell(
+                                                                      onTap: () async {
+                                                                        await _selectDate(
+                                                                            context);
+                                                                      },
+                                                                      child: Text(
+                                                                          "Tarih*"))),
+                                                              Expanded(
+                                                                flex: 4,
+                                                                child: Container(
+                                                                  height: 45,
+                                                                  child: TextFormField(
+                                                                    controller: contar,
+                                                                    decoration:
+                                                                        const InputDecoration(
+                                                                            border:
+                                                                                OutlineInputBorder()),
+                                                                    validator: (value) {
+                                                                      // validation logic
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.all(8.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Expanded(
+                                                                  flex: 1,
+                                                                  child: Text("Hesap*")),
+                                                              Expanded(
+                                                                  flex: 4,
+                                                                  child: _dropdownbutton(
+                                                                      kasalist)
+                                                                  /* Container(
+                                                                  height: 45,
+                                                                  child: TextFormField(
+                                                                    decoration:
+                                                                        const InputDecoration(
+                                                                            border:
+                                                                                OutlineInputBorder()),
+                                                                    validator: (value) {
+                                                                      // validation logic
+                                                                    },
+                                                                  ),
+                                                                ),*/
+                                                                  ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.all(8.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Expanded(
+                                                                  flex: 1,
+                                                                  child: Text("Meblağ*")),
+                                                              Expanded(
+                                                                flex: 4,
+                                                                child: Container(
+                                                                  height: 45,
+                                                                  child: TextFormField(
+                                                                    controller: condeg,
+                                                                    //         initialValue:
+                                                                    //               " ${widget.dt.geneltoplam - widget.dt.alinmism}",
+                                                                    decoration:
+                                                                        const InputDecoration(
+                                                                            border:
+                                                                                OutlineInputBorder()),
+                                                                    validator: (value) {
+                                                                      var x =
+                                                                          num.tryParse(
+                                                                              value);
+                                                                      if (x == null) {
+                                                                        return "Lütfen geçerli bir sayı giriniz";
+                                                                      }
+                                                                      return null;
+
+                                                                      // validation logic
+                                                                    },
+                                                                    onSaved: (v) {
+                                                                      var x =
+                                                                          num.tryParse(v);
+
+                                                                      deger = x;
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.all(8.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Expanded(
+                                                                  flex: 1,
+                                                                  child:
+                                                                      Text("Açıklama*")),
+                                                              Expanded(
+                                                                flex: 4,
+                                                                child: Container(
+                                                                  height: 45,
+                                                                  child: TextFormField(
+                                                                    controller: conacik,
+                                                                    decoration:
+                                                                        const InputDecoration(
+                                                                            border:
+                                                                                OutlineInputBorder()),
+                                                                    validator: (value) {
+                                                                      // validation logic
+                                                                    },
+                                                                    onSaved: (v) {
+                                                                      acikla = v;
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                            onPressed: () async {
+                                                              /*       if (_formKey.currentState
+                                                                  .validate()) {
+                                                                _formKey.currentState
+                                                                    .save();
+                                                              }*/
+                                                              //         _formKey.currentState
+                                                              //               .save();
+                                                              num x = num.tryParse(
+                                                                  condeg.text);
+                                                              Tahsput tp = Tahsput(
+                                                                  widget.dt.tahsid,
+                                                                  x,
+                                                                  widget.dt.geneltoplam,
+                                                                  selectedDate.toString(),
+                                                                  kas.kasaid,
+                                                                  conacik.text);
+                                                              bool b = await APIServices
+                                                                  .tahsharguncelle(tp);
+                                                              print(b.toString());
+                                                            },
+                                                            child: Text("Tahsilat Ekle"))
+                                                      ],
+                                                    ),
+                                            ],
+                                          ),
+                                        ),*/
+                                  /*    SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          width: wsize / 5,
+                                          decoration: BoxDecoration(
+                                            color: Colors.amberAccent,
+                                            //     borderRadius: BorderRadius.circular(10)
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  "Fatura Geçmişi",
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                              ListTile(
+                                                leading: Icon(Icons.keyboard_arrow_down),
+                                                title: Text("Fatura Güncellendi"),
+                                                subtitle: Text("03 Şubat 2020"),
+                                              ),
+                                              Divider(),
+                                              ListTile(
+                                                leading: Icon(Icons.keyboard_arrow_down),
+                                                title: Text("Fatura Güncellendi"),
+                                                subtitle: Text("03 Şubat 2020"),
+                                              ),
+                                              Divider(),
+                                              ListTile(
+                                                leading: Icon(Icons.keyboard_arrow_down),
+                                                title: Text("Fatura Güncellendi"),
+                                                subtitle: Text("03 Şubat 2020"),
+                                              )
+                                            ],
+                                          ),
+                                        )*/
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
+                ],
               ),
+              //      ],
+              //      ),
+              //      ),
             )));
   }
 }

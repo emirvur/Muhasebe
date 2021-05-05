@@ -9,8 +9,11 @@ import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/ui/urunler_ui.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/createExcel.dart';
+import 'package:Muhasebe/utils/pdf.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgappbarfake.dart';
 import 'package:Muhasebe/utils/wdgfakebutton.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
@@ -52,7 +55,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
       kas = kasalist[0];
     });
     APIServices.fatuurundetay(widget.dt.fatid).then((value) {
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           lis = value;
           _isloading = false;
@@ -125,12 +128,42 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
     condeg.dispose();
   }
 
+  showAlertDialog(BuildContext context, dynamic pdf) {
+    AlertDialog alert = AlertDialog(
+      // title: Text("Simple Alert"),
+      content: Text("Pdf dosyası indirme"),
+      actions: [
+        FlatButton(
+          child: Text("İptal"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        FlatButton(
+          child: Text("İndir"),
+          onPressed: () {
+            anchorpdf(pdf, "satisfat");
+            Navigator.of(context).pop();
+          },
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
-      appBar: AppBar(
+      /*  appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.grey.shade300,
           title:
@@ -142,28 +175,24 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
           //other styles
         ),
         child: Drawer(child: Wdgdrawer()),
-      ),
+      ),*/
       backgroundColor: Colors.grey.shade300,
       body: LoadingOverlay(
         isLoading: _isloading,
-        opacity: 0.2,
-        progressIndicator: Center(
-          child: Column(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(
-                height: 50,
-              ),
-              Text("Yükleniyor...")
-            ],
-          ),
-        ),
+        opacity: 0,
+        progressIndicator: Wdgloadingalert(wsize: wsize),
         child: Row(
           children: [
+            Container(
+                color: Colors.black87,
+                width: wsize.width / 5,
+                //    height: 500,
+                child: Wdgdrawer()),
             Expanded(
               flex: 78,
               child: Column(
                 children: [
+                  Wdgappbar("wwww", "gggg", "qqqsw"),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -263,7 +292,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                           ),
                           Divider(),
                           Container(
-                              width: wsize,
+                              width: wsize.width,
                               child: DataTable(
                                   headingRowColor:
                                       MaterialStateColor.resolveWith(
@@ -359,12 +388,12 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                width: (2 * wsize) / 6,
+                                width: (2 * wsize.width) / 6,
                                 height: 120,
                                 color: Colors.white,
                               ),
                               Container(
-                                width: (2 * wsize) / 6,
+                                width: (2 * wsize.width) / 6,
                                 height: 120,
                                 //     color: Colors.green,
                                 child: Column(
@@ -519,6 +548,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                 child: Column(
                   //         mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Wdgappbarfake(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -536,11 +566,16 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                               color: Colors.grey.shade700,
                               textColor: Colors.white,
                               onPressed: () {
-                                /*    Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PDFExcel(widget.dt, lis)));*/
+                                /*  setState(() {
+                                  _isloading = true;
+                                });
+                                createPDF1("test", lis).then((value) {
+                                  setState(() {
+                                    _isloading = false;
+                                  });
+                                  showAlertDialog(context, value);
+                                });
+                               */
                               },
                             ),
                           ),
@@ -559,11 +594,17 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                               color: Colors.grey.shade700,
                               textColor: Colors.white,
                               onPressed: () {
-                                /*     Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PDFSave(widget.dt, lis)));*/
+                                setState(() {
+                                  _isloading = true;
+                                });
+                                createPDF1(widget.dt.cariad, widget.dt.duztarih,
+                                        widget.dt, lis)
+                                    .then((value) {
+                                  setState(() {
+                                    _isloading = false;
+                                  });
+                                  showAlertDialog(context, value);
+                                });
                               },
                             ),
                           ),
@@ -571,7 +612,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                       ],
                     ),
                     Container(
-                      width: wsize / 5,
+                      width: wsize.width / 5,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         //     borderRadius: BorderRadius.circular(10)
@@ -690,7 +731,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                           ),*/
                               tahsilform != true
                                   ? Container(
-                                      width: wsize / 5,
+                                      width: wsize.width / 5,
                                       child: FlatButton(
                                         child: Text('Tahsilat Ekle'),
                                         color: widget.dt.durum == 0
@@ -751,7 +792,7 @@ class _SatisfatDetailuiState extends State<SatisfatDetailui> {
                                                   children: <Widget>[
                                                     ListTile(
                                                         title: Text(
-                                                            " ${selectedDate.year}, ${selectedDate.month}, ${selectedDate.day}"),
+                                                            " ${selectedDate.day}-${selectedDate.month}-${selectedDate.year}"),
                                                         trailing: Icon(Icons
                                                             .calendar_today),
                                                         onTap: () async {

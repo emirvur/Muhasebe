@@ -9,7 +9,9 @@ import 'package:Muhasebe/models/urunhareket.dart';
 import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgappbarfake.dart';
 import 'package:Muhasebe/utils/wdgfakebutton.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -50,7 +52,7 @@ class _SatfatdetailicinurunState extends State<Satfatdetailicinurun> {
       print(fat.fataciklama);
     });
     APIServices.fatuurundetay(widget.dt).then((value) {
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           lis = value;
           _isloading = false;
@@ -129,10 +131,10 @@ class _SatfatdetailicinurunState extends State<Satfatdetailicinurun> {
 
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
-      appBar: AppBar(
+      /*  appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.grey.shade300,
           title:
@@ -144,28 +146,24 @@ class _SatfatdetailicinurunState extends State<Satfatdetailicinurun> {
           //other styles
         ),
         child: Drawer(child: Wdgdrawer()),
-      ),
+      ),*/
       backgroundColor: Colors.grey.shade300,
       body: LoadingOverlay(
         isLoading: _isloading,
-        opacity: 0.2,
-        progressIndicator: Center(
-          child: Column(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(
-                height: 50,
-              ),
-              Text("Yükleniyor...")
-            ],
-          ),
-        ),
+        opacity: 0,
+        progressIndicator: Wdgloadingalert(wsize: wsize),
         child: Row(
           children: [
+            Container(
+                color: Colors.black87,
+                width: wsize.width / 5,
+                //    height: 500,
+                child: Wdgdrawer()),
             Expanded(
               flex: 78,
               child: Column(
                 children: [
+                  Wdgappbar("wwww", "gggg", "qqqsw"),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -265,7 +263,7 @@ class _SatfatdetailicinurunState extends State<Satfatdetailicinurun> {
                           ),
                           Divider(),
                           Container(
-                              width: wsize,
+                              width: wsize.width,
                               child: DataTable(
                                   headingRowColor:
                                       MaterialStateColor.resolveWith(
@@ -360,12 +358,12 @@ class _SatfatdetailicinurunState extends State<Satfatdetailicinurun> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                width: (2 * wsize) / 6,
+                                width: (2 * wsize.width) / 6,
                                 height: 120,
                                 color: Colors.white,
                               ),
                               Container(
-                                width: (2 * wsize) / 6,
+                                width: (2 * wsize.width) / 6,
                                 height: 120,
                                 //     color: Colors.green,
                                 child: Column(
@@ -517,6 +515,7 @@ class _SatfatdetailicinurunState extends State<Satfatdetailicinurun> {
                 child: Column(
                   //         mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Wdgappbarfake(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -569,7 +568,7 @@ class _SatfatdetailicinurunState extends State<Satfatdetailicinurun> {
                       ],
                     ),
                     Container(
-                      width: wsize / 5,
+                      width: wsize.width / 5,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         //     borderRadius: BorderRadius.circular(10)
@@ -682,7 +681,7 @@ class _SatfatdetailicinurunState extends State<Satfatdetailicinurun> {
                                           ),*/
                               tahsilform != true
                                   ? Container(
-                                      width: wsize / 5,
+                                      width: wsize.width / 5,
                                       child: FlatButton(
                                         child: Text('Tahsilat Ekle'),
                                         color: fat.durum == 0

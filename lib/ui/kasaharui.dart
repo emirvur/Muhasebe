@@ -10,6 +10,8 @@ import 'package:Muhasebe/models/urunhareket.dart';
 import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgappbarfake.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -48,7 +50,7 @@ class _KasaharuiState extends State<Kasaharui> {
       kas = kasalist[0];
     });
     APIServices.kasahar(widget.dt.kasaid).then((value) {
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           lis = value;
           _isloading = false;
@@ -123,10 +125,10 @@ class _KasaharuiState extends State<Kasaharui> {
 
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
-      appBar: AppBar(
+      /*   appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.grey.shade300,
           title: Wdgappbar("Kasa ve Bankalar >", "Kasa Hesabı", "Ahmet Seç")),
@@ -137,28 +139,24 @@ class _KasaharuiState extends State<Kasaharui> {
           //other styles
         ),
         child: Drawer(child: Wdgdrawer()),
-      ),
+      ),*/
       backgroundColor: Colors.grey.shade300,
       body: LoadingOverlay(
         isLoading: _isloading,
         opacity: 0.2,
-        progressIndicator: Center(
-          child: Column(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(
-                height: 50,
-              ),
-              Text("Yükleniyor...")
-            ],
-          ),
-        ),
+        progressIndicator: Wdgloadingalert(wsize: wsize),
         child: Row(
           children: [
+            Container(
+                color: Colors.black87,
+                width: wsize.width / 5,
+                //    height: 500,
+                child: Wdgdrawer()),
             Expanded(
               flex: 78,
               child: Column(
                 children: [
+                  Wdgappbar("wwww", "gggg", "qqqsw"),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -204,7 +202,7 @@ class _KasaharuiState extends State<Kasaharui> {
                           SingleChildScrollView(
                             physics: ScrollPhysics(),
                             child: Container(
-                                width: wsize,
+                                width: wsize.width,
                                 child: DataTable(
                                     headingRowColor:
                                         MaterialStateColor.resolveWith(
@@ -319,6 +317,7 @@ class _KasaharuiState extends State<Kasaharui> {
               flex: 22,
               child: Column(
                 children: [
+                  Wdgappbarfake(),
                   Padding(
                     padding: EdgeInsets.only(right: 8.0),
                     child: Container(

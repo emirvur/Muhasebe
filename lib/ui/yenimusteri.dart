@@ -28,7 +28,7 @@ class _YenimusteriState extends State<Yenimusteri> {
     final wsize = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
-          appBar: AppBar(
+          /*   appBar: AppBar(
               elevation: 0,
               backgroundColor: Colors.grey.shade300,
               title: Wdgappbar("Müşteriler >", "Yeni", "Ahmet Seç")),
@@ -39,14 +39,22 @@ class _YenimusteriState extends State<Yenimusteri> {
               //other styles
             ),
             child: Drawer(child: Wdgdrawer()),
-          ),
+          ),*/
           backgroundColor: Colors.grey.shade300,
           body: Row(
             children: [
+              Container(
+                  color: Colors.black87,
+                  width: wsize / 5,
+                  //    height: 500,
+                  child: Wdgdrawer()),
               Expanded(
-                child: SingleChildScrollView(
-                  child: Expanded(
+                child: Scrollbar(
+                  isAlwaysShown: true,
+                  child: SingleChildScrollView(
+                    //  child: Expanded(
                     child: Column(children: [
+                      Wdgappbar("wwww", "gggg", "qqqsw"),
                       Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -261,79 +269,79 @@ class _YenimusteriState extends State<Yenimusteri> {
                                         ),
                                       ),
                                       /*     Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                                flex: 1,
-                                                child: Center(
-                                                    child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Icon(Icons
-                                                            .bar_chart_outlined)),
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text(
-                                                          "Alış/Satış Birimi",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.grey,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )),
-                                                  ],
-                                                ))),
-                                            Expanded(
-                                                flex: 4,
-                                                child: DropdownButton<String>(
-                                                  value: dropstr,
-                                                  items: <String>[
-                                                    'Adet',
-                                                    'Kilogram',
-                                                    'Litre',
-                                                  ].map((String value) {
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value: value,
-                                                      child: Text(value),
-                                                    );
-                                                  }).toList(),
-                                                  onChanged: (v) {
-                                                    dropstr = v;
-                                                  },
-                                                )),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  height: 45,
-                                                  margin: EdgeInsets.all(20),
-                                                  child: FlatButton(
-                                                    child: Text(''),
-                                                    color: Colors.white,
-                                                    textColor: Colors.white,
-                                                    onPressed: () {},
-                                                  ),
-                                                ),
-                                                Container(
-                                                  height: 45,
-                                                  margin: EdgeInsets.all(20),
-                                                  child: FlatButton(
-                                                    child: Text(''),
-                                                    color: Colors.white,
-                                                    textColor: Colors.white,
-                                                    onPressed: () {
-                                                      //kaydet işlemi yapp
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: Center(
+                                                      child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Icon(Icons
+                                                              .bar_chart_outlined)),
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Text(
+                                                            "Alış/Satış Birimi",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          )),
+                                                    ],
+                                                  ))),
+                                              Expanded(
+                                                  flex: 4,
+                                                  child: DropdownButton<String>(
+                                                    value: dropstr,
+                                                    items: <String>[
+                                                      'Adet',
+                                                      'Kilogram',
+                                                      'Litre',
+                                                    ].map((String value) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: value,
+                                                        child: Text(value),
+                                                      );
+                                                    }).toList(),
+                                                    onChanged: (v) {
+                                                      dropstr = v;
                                                     },
+                                                  )),
+                                              Row(
+                                                children: [
+                                                  Container(
+                                                    height: 45,
+                                                    margin: EdgeInsets.all(20),
+                                                    child: FlatButton(
+                                                      child: Text(''),
+                                                      color: Colors.white,
+                                                      textColor: Colors.white,
+                                                      onPressed: () {},
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),*/
+                                                  Container(
+                                                    height: 45,
+                                                    margin: EdgeInsets.all(20),
+                                                    child: FlatButton(
+                                                      child: Text(''),
+                                                      color: Colors.white,
+                                                      textColor: Colors.white,
+                                                      onPressed: () {
+                                                        //kaydet işlemi yapp
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),*/
                                       Divider(
                                         height: 20,
                                       ),
@@ -703,6 +711,7 @@ class _YenimusteriState extends State<Yenimusteri> {
                                 ),
                               ])))
                     ]),
+                    //   ),
                   ),
                 ),
               ),

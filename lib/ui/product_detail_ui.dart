@@ -3,10 +3,12 @@ import 'package:Muhasebe/models/dtourun.dart';
 import 'package:Muhasebe/models/dtourungecmisi.dart';
 
 import 'package:Muhasebe/services/apiservices.dart';
+import 'package:Muhasebe/ui/alfatdetayicin.dart';
 import 'package:Muhasebe/ui/satisfaticinurun.dart';
 
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -32,7 +34,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
     _tabController = new TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabSelection);
     APIServices.urungecmisial(widget.ur.barkodno).then((value) {
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           lis = value;
           _isloading = false;
@@ -76,10 +78,10 @@ class _ProdDetailuiState extends State<ProdDetailui>
 
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-          appBar: AppBar(
+          /* appBar: AppBar(
               elevation: 0,
               backgroundColor: Colors.grey.shade300,
               title: Wdgappbar(
@@ -91,29 +93,25 @@ class _ProdDetailuiState extends State<ProdDetailui>
               //other styles
             ),
             child: Drawer(child: Wdgdrawer()),
-          ),
+          ),*/
           backgroundColor: Colors.grey.shade300,
           //       Color.fromRGBO(220, 221, 220, 1),
           body: LoadingOverlay(
             isLoading: _isloading,
             opacity: 0,
-            progressIndicator: Center(
-              child: Column(
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Text("Yükleniyor...")
-                ],
-              ),
-            ),
+            progressIndicator: Wdgloadingalert(wsize: wsize),
             child: Row(
               children: [
+                Container(
+                    color: Colors.black87,
+                    width: wsize.width / 5,
+                    //    height: 500,
+                    child: Wdgdrawer()),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Expanded(
                       child: Column(children: [
+                        Wdgappbar("wwww", "gggg", "qqqsw"),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -206,7 +204,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                         ],
                                       ),
                                       SizedBox(
-                                        width: wsize / 30,
+                                        width: wsize.width / 30,
                                       ),
                                       Row(
                                         children: [
@@ -238,7 +236,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                         ],
                                       ),
                                       SizedBox(
-                                        width: wsize / 30,
+                                        width: wsize.width / 30,
                                       ),
                                       Row(
                                         children: [
@@ -270,7 +268,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                         ],
                                       ),
                                       SizedBox(
-                                        width: wsize / 30,
+                                        width: wsize.width / 30,
                                       ),
                                       Row(
                                         children: [
@@ -338,7 +336,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                     decoration: BoxDecoration(
                                         color: Colors.grey.shade100),
                                     //  height: 60,
-                                    width: wsize / 2,
+                                    width: wsize.width / 2,
                                     //      margin: EdgeInsets.only(left: 60),
                                     child: TabBar(
                                       tabs: [
@@ -382,7 +380,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                       controller: _tabController,
                                       children: <Widget>[
                                         Container(
-                                            width: wsize,
+                                            width: wsize.width,
                                             child: DataTable(
                                                 headingRowColor:
                                                     MaterialStateColor
@@ -423,13 +421,22 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                                     .map((e) => DataRow(cells: [
                                                           DataCell(InkWell(
                                                               onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                      builder: (context) =>
-                                                                          Satfatdetailicinurun(
-                                                                              e.fatid)),
-                                                                );
+                                                                e.fattur ==
+                                                                        "Stok Çıkış"
+                                                                    ? Navigator
+                                                                        .push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                Satfatdetailicinurun(e.fatid)),
+                                                                      )
+                                                                    : Navigator
+                                                                        .push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                Alfatdetailicinurun(e.fatid)),
+                                                                      );
                                                               },
                                                               child: Text(e
                                                                   .fattur
@@ -451,7 +458,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                                     .toList())),
                                         Container(
                                           child: Container(
-                                              width: wsize,
+                                              width: wsize.width,
                                               child: DataTable(
                                                   headingRowColor:
                                                       MaterialStateColor
@@ -552,7 +559,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                         ),
                                         Container(
                                           child: Container(
-                                              width: wsize,
+                                              width: wsize.width,
                                               child: DataTable(
                                                   headingRowColor:
                                                       MaterialStateColor
@@ -615,7 +622,7 @@ class _ProdDetailuiState extends State<ProdDetailui>
                                                                     MaterialPageRoute(
                                                                         builder:
                                                                             (context) =>
-                                                                                Satfatdetailicinurun(e.fatid)),
+                                                                                Alfatdetailicinurun(e.fatid)),
                                                                   );
                                                                 },
                                                                 child: Text(e

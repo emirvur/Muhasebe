@@ -3,9 +3,11 @@ import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
 import 'package:Muhasebe/utils/wdgfakebutton.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
+import 'package:intl/intl.dart';
 
 class Yenikasaui extends StatefulWidget {
   @override
@@ -25,6 +27,7 @@ class _YenikasauiState extends State<Yenikasaui> {
 
   _pickDate() async {
     DateTime date = await showDatePicker(
+      locale: Locale("tr"),
       context: context,
       firstDate: DateTime(DateTime.now().year - 5),
       lastDate: DateTime(DateTime.now().year + 5),
@@ -62,7 +65,7 @@ class _YenikasauiState extends State<Yenikasaui> {
       });
 
       // Simulate a service call
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           Kasa kas = Kasa(0, conthes.text, bak);
           APIServices.kasaekle(kas).then((value) {
@@ -80,10 +83,10 @@ class _YenikasauiState extends State<Yenikasaui> {
 
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-          appBar: AppBar(
+          /*appBar: AppBar(
               elevation: 0,
               backgroundColor: Colors.grey.shade300,
               title: Wdgappbar("Kasa ve Bankalar >", "Yeni Kasa", "Ahmet Seç")),
@@ -94,19 +97,25 @@ class _YenikasauiState extends State<Yenikasaui> {
               //other styles
             ),
             child: Drawer(child: Wdgdrawer()),
-          ),
+          ),*/
           backgroundColor: Colors.grey.shade300,
           body: LoadingOverlay(
             isLoading: _isLoading,
-            progressIndicator: Column(
-              children: [CircularProgressIndicator(), Text("Yükleniyor...")],
-            ),
+            progressIndicator: Wdgloadingalert(wsize: wsize),
             child: Row(
               children: [
+                Container(
+                    color: Colors.black87,
+                    width: wsize.width / 5,
+                    //    height: 500,
+                    child: Wdgdrawer()),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: Expanded(
+                  child: Scrollbar(
+                    isAlwaysShown: true,
+                    child: SingleChildScrollView(
+                      //    child: Expanded(
                       child: Column(children: [
+                        Wdgappbar("wwww", "gggg", "qqqsw"),
                         Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
@@ -310,8 +319,11 @@ class _YenikasauiState extends State<Yenikasaui> {
                                                             .start,
                                                     children: <Widget>[
                                                       ListTile(
-                                                        title: Text(
-                                                            " ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}"),
+                                                        title: Text(DateFormat
+                                                                .yMMMd('tr_TR')
+                                                            .format(
+                                                                pickedDate)),
+                                                        //  " ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}"),
                                                         trailing: Icon(Icons
                                                             .calendar_today),
                                                         onTap: _pickDate,
@@ -329,6 +341,7 @@ class _YenikasauiState extends State<Yenikasaui> {
                                   ),
                                 ])))
                       ]),
+                      //  ),
                     ),
                   ),
                 ),

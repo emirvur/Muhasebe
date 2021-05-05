@@ -4,6 +4,7 @@ import 'package:Muhasebe/ui/kasaharui.dart';
 import 'package:Muhasebe/ui/yenikasaui.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -22,7 +23,7 @@ class _KasaListesiuiState extends State<KasaListesiui>
     // TODO: implement initState
     super.initState();
     APIServices.kasaal().then((value) {
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           lis = value;
           _isloading = false;
@@ -33,10 +34,10 @@ class _KasaListesiuiState extends State<KasaListesiui>
 
   @override
   Widget build(BuildContext context) {
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
+        /*  appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.grey.shade300,
             title: Wdgappbar("Kasa ve Bankalar >", "", "Ahmet Seç")),
@@ -47,27 +48,23 @@ class _KasaListesiuiState extends State<KasaListesiui>
             //other styles
           ),
           child: Drawer(child: Wdgdrawer()),
-        ),
+        ),*/
         backgroundColor: Colors.grey.shade300,
         body: LoadingOverlay(
           isLoading: _isloading,
           opacity: 0,
-          progressIndicator: Center(
-            child: Column(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(
-                  height: 50,
-                ),
-                Text("Yükleniyor...")
-              ],
-            ),
-          ),
+          progressIndicator: Wdgloadingalert(wsize: wsize),
           child: Row(
             children: [
+              Container(
+                  color: Colors.black87,
+                  width: wsize.width / 5,
+                  //    height: 500,
+                  child: Wdgdrawer()),
               Expanded(
                 child: Column(
                   children: [
+                    Wdgappbar("wwww", "gggg", "qqqsw"),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -116,7 +113,7 @@ class _KasaListesiuiState extends State<KasaListesiui>
                       ),
                     ),
                     Container(
-                        width: wsize,
+                        width: wsize.width,
                         child: DataTable(
                             columnSpacing: 400,
                             columns: const <DataColumn>[

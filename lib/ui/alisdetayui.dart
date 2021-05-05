@@ -10,8 +10,11 @@ import 'package:Muhasebe/models/tahsput.dart';
 import 'package:Muhasebe/models/urunhareket.dart';
 import 'package:Muhasebe/services/apiservices.dart';
 import 'package:Muhasebe/utils/Wdgdrawer.dart';
+import 'package:Muhasebe/utils/pdf.dart';
 import 'package:Muhasebe/utils/wdgappbar.dart';
+import 'package:Muhasebe/utils/wdgappbarfake.dart';
 import 'package:Muhasebe/utils/wdgfakebutton.dart';
+import 'package:Muhasebe/utils/wdgloadingalert.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -54,13 +57,43 @@ class _AlisfatDetailuiState extends State<AlisfatDetailui> {
       kas = kasalist[0];
     });
     APIServices.fatuurundetay(widget.dt.fatid).then((value) {
-      Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(seconds: 1), () {
         setState(() {
           lis = value;
           _isloading = false;
         });
       });
     });
+  }
+
+  showAlertDialog(BuildContext context, dynamic pdf) {
+    AlertDialog alert = AlertDialog(
+      // title: Text("Simple Alert"),
+      content: Text("Pdf dosyası indirme"),
+      actions: [
+        FlatButton(
+          child: Text("İptal"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        FlatButton(
+          child: Text("İndir"),
+          onPressed: () {
+            anchorpdf(pdf, "alisfat");
+            Navigator.of(context).pop();
+          },
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   @override
@@ -130,10 +163,10 @@ class _AlisfatDetailuiState extends State<AlisfatDetailui> {
   @override
   Widget build(BuildContext context) {
     print(ltah.length.toString());
-    final wsize = MediaQuery.of(context).size.width;
+    final wsize = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
-      appBar: AppBar(
+      /* appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.grey.shade300,
           title: Wdgappbar("Giderler >", "Fiş/Fatura", "Ahmet Seç")),
@@ -144,28 +177,24 @@ class _AlisfatDetailuiState extends State<AlisfatDetailui> {
           //other styles
         ),
         child: Drawer(child: Wdgdrawer()),
-      ),
+      ),*/
       backgroundColor: Colors.grey.shade300,
       body: LoadingOverlay(
         isLoading: _isloading,
         opacity: 0.2,
-        progressIndicator: Center(
-          child: Column(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(
-                height: 50,
-              ),
-              Text("Yükleniyor...")
-            ],
-          ),
-        ),
+        progressIndicator: Wdgloadingalert(wsize: wsize),
         child: Row(
           children: [
+            Container(
+                color: Colors.black87,
+                width: wsize.width / 5,
+                //    height: 500,
+                child: Wdgdrawer()),
             Expanded(
               flex: 78,
               child: Column(
                 children: [
+                  Wdgappbar("wwww", "gggg", "qqqsw"),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -253,7 +282,7 @@ class _AlisfatDetailuiState extends State<AlisfatDetailui> {
                           ),
                           Divider(),
                           Container(
-                              width: wsize,
+                              width: wsize.width,
                               child: DataTable(
                                   headingRowColor:
                                       MaterialStateColor.resolveWith(
@@ -329,12 +358,12 @@ class _AlisfatDetailuiState extends State<AlisfatDetailui> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                width: (2 * wsize) / 6,
+                                width: (2 * wsize.width) / 6,
                                 height: 120,
                                 color: Colors.white,
                               ),
                               Container(
-                                width: (2 * wsize) / 6,
+                                width: (2 * wsize.width) / 6,
                                 height: 120,
                                 //     color: Colors.green,
                                 child: Column(
@@ -490,6 +519,7 @@ class _AlisfatDetailuiState extends State<AlisfatDetailui> {
                 flex: 22,
                 child: Column(
                   children: [
+                    Wdgappbarfake(),
                     tahsilform == false
                         ? Row(
                             children: [
@@ -528,7 +558,7 @@ class _AlisfatDetailuiState extends State<AlisfatDetailui> {
                           )
                         : Text(""),
                     Container(
-                      width: wsize / 5,
+                      width: wsize.width / 5,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         //     borderRadius: BorderRadius.circular(10)
@@ -581,17 +611,47 @@ class _AlisfatDetailuiState extends State<AlisfatDetailui> {
                             ),
                           ),
                           tahsilform == false
-                              ? Center(
-                                  child: FlatButton(
-                                    child: Text('Paylaş'),
-                                    color: Colors.blueAccent,
-                                    textColor: Colors.white,
-                                    onPressed: () {
-                                      setState(() {
-                                        print("nn");
-                                      });
-                                    },
-                                  ),
+                              ? Column(
+                                  children: [
+                                    Center(
+                                      child: FlatButton(
+                                        child: Text('Paylaş'),
+                                        color: Colors.blueAccent,
+                                        textColor: Colors.white,
+                                        onPressed: () {
+                                          setState(() {
+                                            print("nn");
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Center(
+                                      child: FlatButton(
+                                        child: Text('Yazdır'),
+                                        color: Colors.blueAccent,
+                                        textColor: Colors.white,
+                                        onPressed: () {
+                                          setState(() {
+                                            _isloading = true;
+                                          });
+                                          createPDF1(
+                                                  widget.dt.cariad,
+                                                  widget.dt.duztarih,
+                                                  widget.dt,
+                                                  lis)
+                                              .then((value) {
+                                            setState(() {
+                                              _isloading = false;
+                                            });
+                                            showAlertDialog(context, value);
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 )
                               : Text(""),
                           tahsilform == false

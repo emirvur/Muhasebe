@@ -1,5 +1,8 @@
 import 'dart:math';
+import 'package:Muhasebe/models/dtofattahs.dart';
 import 'package:Muhasebe/models/dtourungecmisi.dart';
+import 'package:Muhasebe/services/apiservices.dart';
+import 'package:Muhasebe/ui/satisfat_detay_ui.dart';
 import 'package:Muhasebe/ui/satisfaticinurun.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:fl_chart/fl_chart.dart';
@@ -19,6 +22,8 @@ class SatfatraporState extends State with TickerProviderStateMixin {
   List<charts.Series> seriesList;
   List<Dtourungecmisi> lis = [];
   TabController _tabController;
+  List<Dtofattahs> dtofattahslis = [];
+  bool _isloading = true;
 
   static List<charts.Series<Sales, String>> _createRandomData() {
     final random = Random();
@@ -78,7 +83,16 @@ class SatfatraporState extends State with TickerProviderStateMixin {
   void initState() {
     super.initState();
     seriesList = _createRandomData();
+    var h = DateTime(baslangictar.year, baslangictar.month, 1);
     _tabController = new TabController(length: 3, vsync: this);
+    APIServices.raporsatfattaral(h, baslangictar).then((value) {
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          dtofattahslis = value;
+          _isloading = false;
+        });
+      });
+    });
   }
 
   barChart() {
@@ -98,6 +112,7 @@ class SatfatraporState extends State with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    print(dtofattahslis.length.toString());
     final wsize = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
@@ -130,284 +145,314 @@ class SatfatraporState extends State with TickerProviderStateMixin {
               ),
             ],
           )),
-      body: SingleChildScrollView(
-        physics: ScrollPhysics(),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
+      body: Scrollbar(
+        child: SingleChildScrollView(
+          physics: ScrollPhysics(),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white),
+                    height: 100,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Satış Faturaları",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Spacer(),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  flex: 1,
+                                  child: InkWell(
+                                      onTap: () async {
+                                        await secbasl(context);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        child: Text(
+                                          "Başlangıç Tarihi",
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ))),
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      //  border: Border.all(color: Colors.black)
+                                      ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      ListTile(
+                                          title: Text(
+                                              " ${baslangictar.year}, ${baslangictar.month}, ${baslangictar.day}"),
+                                          trailing: Icon(Icons.calendar_today),
+                                          onTap: () async {
+                                            await secbasl(context);
+                                          }),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  flex: 1,
+                                  child: InkWell(
+                                      onTap: () async {
+                                        await secbitis(context);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: Text("Bitiş Tarihi",
+                                            style:
+                                                TextStyle(color: Colors.grey)),
+                                      ))),
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      //    border: Border.all(color: Colors.black)
+                                      ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      ListTile(
+                                          title: Text(
+                                              " ${bitistar.year}, ${bitistar.month}, ${bitistar.day}"),
+                                          trailing: Icon(Icons.calendar_today),
+                                          onTap: () async {
+                                            await secbitis(context);
+                                          }),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                            onPressed: () async {
+                              var g = DateTime(baslangictar.year,
+                                  baslangictar.month, baslangictar.day);
+                              var h = DateTime(
+                                  bitistar.year, bitistar.month, bitistar.day);
+                              APIServices.raporsatfattaral(g, h).then((value) {
+                                setState(() {
+                                  dtofattahslis = value;
+                                });
+                              });
+                              //   dtofattahslis = y;
+                            },
+                            child: Text(
+                              "Uygula",
+                              style: TextStyle(fontSize: 18),
+                            ))
+                      ],
+                    )),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: Colors.white),
-                  height: 100,
+                  height: 175,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Satış Faturaları",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      Spacer(),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Expanded(
-                                flex: 1,
-                                child: InkWell(
-                                    onTap: () async {
-                                      await secbasl(context);
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8),
-                                      child: Text(
-                                        "Başlangıç Tarihi",
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
-                                    ))),
-                            Expanded(
-                              flex: 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    //  border: Border.all(color: Colors.black)
-                                    ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    ListTile(
-                                        title: Text(
-                                            " ${baslangictar.year}, ${baslangictar.month}, ${baslangictar.day}"),
-                                        trailing: Icon(Icons.calendar_today),
-                                        onTap: () async {
-                                          await secbasl(context);
-                                        }),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Expanded(
-                                flex: 1,
-                                child: InkWell(
-                                    onTap: () async {
-                                      await secbitis(context);
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: Text("Bitiş Tarihi",
-                                          style: TextStyle(color: Colors.grey)),
-                                    ))),
-                            Expanded(
-                              flex: 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    //    border: Border.all(color: Colors.black)
-                                    ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    ListTile(
-                                        title: Text(
-                                            " ${bitistar.year}, ${bitistar.month}, ${bitistar.day}"),
-                                        trailing: Icon(Icons.calendar_today),
-                                        onTap: () async {
-                                          await secbitis(context);
-                                        }),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            "Uygula",
-                            style: TextStyle(fontSize: 18),
-                          ))
+                      Expanded(child: buildpiechart("Fatura Kategorileri")),
+                      Expanded(child: buildpiechart("Müşteri Kategorileri")),
+                      Expanded(child: buildpiechart("Ürün Kategorileri")),
                     ],
-                  )),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white),
-                height: 175,
-                child: Row(
-                  children: [
-                    Expanded(child: buildpiechart("Fatura Kategorileri")),
-                    Expanded(child: buildpiechart("Müşteri Kategorileri")),
-                    Expanded(child: buildpiechart("Ürün Kategorileri")),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Satışların Dağılımı",
-                  style: TextStyle(fontSize: 18, color: Colors.black),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Satışların Dağılımı",
+                    style: TextStyle(fontSize: 18, color: Colors.black),
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white),
-                height: 250,
-                child: barChart(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white),
+                  height: 250,
+                  child: barChart(),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Align(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "${baslangictar.year}, ${baslangictar.month}, ${baslangictar.day} - ${bitistar.year}, ${bitistar.month}, ${bitistar.day} ",
+                            style: TextStyle(
+                                fontSize: 24,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          "${baslangictar.year}, ${baslangictar.month}, ${baslangictar.day} - ${bitistar.year}, ${bitistar.month}, ${bitistar.day} ",
-                          style: TextStyle(
-                              fontSize: 24,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold),
+                        child: Container(
+                          decoration:
+                              BoxDecoration(color: Colors.grey.shade100),
+                          //  height: 60,
+                          width: wsize / 2,
+                          //      margin: EdgeInsets.only(left: 60),
+                          child: TabBar(
+                            tabs: [
+                              Container(
+                                width: 35.0,
+                                child: Text(
+                                  'Faturalar',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                              Container(
+                                width: 35.0,
+                                child: Text(
+                                  'Müşteriler',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                              Container(
+                                width: 35.0,
+                                child: Text(
+                                  'Ürünler',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              )
+                            ],
+                            unselectedLabelColor:
+                                Colors.grey, //   const Color(0xffacb3bf),
+                            indicatorColor: Color(0xFFffac81),
+                            labelColor: Colors.black,
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            indicatorWeight: 3.0,
+                            //   indicatorPadding: EdgeInsets.all(10),
+                            isScrollable: false,
+                            controller: _tabController,
+                          ),
                         ),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        decoration: BoxDecoration(color: Colors.grey.shade100),
-                        //  height: 60,
-                        width: wsize / 2,
-                        //      margin: EdgeInsets.only(left: 60),
-                        child: TabBar(
-                          tabs: [
-                            Container(
-                              width: 35.0,
-                              child: Text(
-                                'Faturalar',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ),
-                            Container(
-                              width: 35.0,
-                              child: Text(
-                                'Müşteriler',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            ),
-                            Container(
-                              width: 35.0,
-                              child: Text(
-                                'Ürünler',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            )
-                          ],
-                          unselectedLabelColor:
-                              Colors.grey, //   const Color(0xffacb3bf),
-                          indicatorColor: Color(0xFFffac81),
-                          labelColor: Colors.black,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          indicatorWeight: 3.0,
-                          //   indicatorPadding: EdgeInsets.all(10),
-                          isScrollable: false,
-                          controller: _tabController,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 200,
-                      child: TabBarView(
-                          controller: _tabController,
-                          children: <Widget>[
-                            Container(
-                                width: wsize,
-                                child: DataTable(
-                                    headingRowColor:
-                                        MaterialStateColor.resolveWith(
-                                            (states) => Colors.grey.shade200),
-                                    columns: const <DataColumn>[
-                                      DataColumn(
-                                        label: Text(
-                                          'Fatura Açıklaması',
-                                          style: TextStyle(
-                                              fontStyle: FontStyle.italic),
-                                        ),
+                      Container(
+                        height: 200,
+                        child:
+                            TabBarView(controller: _tabController, children: <
+                                Widget>[
+                          Container(
+                              width: wsize,
+                              child: DataTable(
+                                  headingRowColor:
+                                      MaterialStateColor.resolveWith(
+                                          (states) => Colors.grey.shade200),
+                                  columns: <DataColumn>[
+                                    DataColumn(
+                                      label: Text(
+                                        'Fatura Açıklaması',
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic),
                                       ),
-                                      DataColumn(
-                                        label: Text(
-                                          'Düzenlenme Tarihi',
-                                          style: TextStyle(
-                                              fontStyle: FontStyle.italic),
-                                        ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Düzenlenme Tarihi',
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic),
                                       ),
-                                      DataColumn(
-                                        label: Text(
-                                          'Bakiye',
-                                          style: TextStyle(
-                                              fontStyle: FontStyle.italic),
-                                        ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Bakiye',
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic),
                                       ),
-                                    ],
-                                    rows: lis
-                                        .map((e) => DataRow(cells: [
-                                              DataCell(InkWell(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              Satfatdetailicinurun(
-                                                                  e.fatid)),
-                                                    );
-                                                  },
-                                                  child: Text(
-                                                      e.fattur.toString()))),
-                                              DataCell(Text(
-                                                e.cariad.toString(),
-                                                style: TextStyle(),
-                                              )),
-                                              DataCell(Text(
-                                                e.duzenlemetarih.toString(),
-                                                style: TextStyle(),
-                                              )),
-                                            ]))
-                                        .toList())),
-                            Container(
-                              child: Text("sign up"),
-                            ),
-                            Container(
-                              child: Text("login"),
-                            ),
-                          ]),
-                    )
-                  ],
+                                    ),
+                                  ],
+                                  rows: dtofattahslis
+                                      .map((e) => DataRow(cells: [
+                                            DataCell(InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            SatisfatDetailui(
+                                                                e)),
+                                                  );
+                                                },
+                                                child: Column(
+                                                  children: [
+                                                    Text(e.fataciklama
+                                                        .toString()),
+                                                    Text(e.cariad)
+                                                  ],
+                                                ))),
+                                            DataCell(Text(
+                                              e.duztarih.toString(),
+                                              style: TextStyle(),
+                                            )),
+                                            DataCell(Column(
+                                              children: [
+                                                Text(
+                                                  e.geneltoplam - e.alinmism ==
+                                                          0
+                                                      ? "Tahsil edildi"
+                                                      : (e.geneltoplam -
+                                                              e.alinmism)
+                                                          .toString(),
+                                                  style: TextStyle(),
+                                                ),
+                                                Text(e.geneltoplam.toString())
+                                              ],
+                                            )),
+                                          ]))
+                                      .toList())),
+                          Container(
+                            child: Text("sign up"),
+                          ),
+                          Container(
+                            child: Text("login"),
+                          ),
+                        ]),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
