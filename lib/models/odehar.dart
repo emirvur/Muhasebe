@@ -17,9 +17,9 @@ class Odehar {
     this.odeid = map['odeid'];
     this.odenmistar = map['odenmistar'] ?? "null";
     if (this.odenmistar != "null") {
-      var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(odenmistar));
+      //  var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(odenmistar));
       var yil1 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(odenmistar));
-      this.odenmistar = yil1 + "-" + saat1;
+      this.odenmistar = yil1; // + "-" + saat1;
     }
     this.kasaid = map['kasaid'];
     this.aciklama = map['aciklama'] ?? "null";

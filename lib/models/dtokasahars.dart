@@ -44,18 +44,18 @@ class Dtokasahar {
     this.tahsid = map['tahsid'] ?? -1;
     this.tediltar = map['tediltar'] ?? "null";
     if (this.tediltar != "null") {
-      var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(tediltar));
+      // var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(tediltar));
       var yil1 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(tediltar));
-      this.tediltar = yil1 + "-" + saat1;
+      this.tediltar = yil1; // + "-" + saat1;
     }
     this.tahskasaid = map['tahskasaid'] ?? -1;
     this.tahsaciklama = map['tahsaciklama'] ?? "null";
     this.odeid = map['odeid'] ?? -1;
     this.odenmistar = map['odenmistar'] ?? "null";
     if (this.odenmistar != "null") {
-      var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(odenmistar));
+      // var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(odenmistar));
       var yil2 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(odenmistar));
-      this.odenmistar = yil2 + "-" + saat2;
+      this.odenmistar = yil2; //+ "-" + saat2;
     }
     this.odkasaid = map['odkasaid'] ?? -1;
     this.odaciklama = map['odaciklama'] ?? "null";

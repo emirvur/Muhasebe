@@ -46,9 +46,9 @@ class Irsaliye {
     this.cariId = map['cariId'];
 
     this.tarih = map['tarih'];
-    var saat = DateFormat.jm('tr_TR').format(DateTime.parse(tarih));
+    //var saat = DateFormat.jm('tr_TR').format(DateTime.parse(tarih));
     var yil = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(tarih));
-    this.tarih = yil + "-" + saat;
+    this.tarih = yil; // + "-" + saat;
 
     this.aratop = map['aratop'] ?? -1;
     this.araind = map['araind'] ?? -1;

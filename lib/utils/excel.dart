@@ -5,7 +5,7 @@ import 'package:Muhasebe/models/dtourun.dart';
 import 'package:Muhasebe/models/dtourunhareket.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
-//import 'dart:html' as html;
+import 'dart:html' as html;
 
 Future<List<int>> createexcel(final List<dynamic> lis) async {
   // var anchor;
@@ -193,7 +193,7 @@ Future<List<int>> createexcel(final List<dynamic> lis) async {
 }
 
 anchorexcel(List<int> bytes, String ad) {
-  /*var anchor;
+  var anchor;
   final blob = html.Blob([bytes], 'application/excel');
   final url = html.Url.createObjectUrlFromBlob(blob);
   anchor = html.document.createElement('a') as html.AnchorElement
@@ -201,5 +201,5 @@ anchorexcel(List<int> bytes, String ad) {
     ..style.display = 'none'
     ..download = '${ad}excel.xlsx';
   html.document.body.children.add(anchor);
-  anchor.click();*/
+  anchor.click();
 }

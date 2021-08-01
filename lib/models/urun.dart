@@ -1,5 +1,5 @@
 class Urun {
-  int barkodno;
+  String barkodno;
   String adi;
   int kategoriId;
   String birim;

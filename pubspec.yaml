@@ -32,7 +32,6 @@ dependencies:
   cupertino_icons: ^1.0.0
   http: ^0.12.2
   loading_overlay: ^0.2.1
-  change_app_package_name: ^0.1.2
   pdf: ^2.1.0
   excel: ^1.1.5
   syncfusion_flutter_xlsio: ^18.4.49-beta
@@ -41,6 +40,11 @@ dependencies:
   material_floating_search_bar: ^0.2.6
   shared_preferences: ^0.5.12+3
   flutter_native_splash: ^0.3.0
+  get: ^4.1.4
+  google_fonts: ^1.0.0
+  font_awesome_flutter: ^9.1.0
+  url_launcher: ^5.7.8
+  fluttertoast: ^8.0.7
   
   
 

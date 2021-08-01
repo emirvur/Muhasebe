@@ -16,10 +16,10 @@ class Dtostokgecmisi {
     this.fattur = map['fatTur'] == 0 ? "Stok Giriş" : "Stok Çıkış";
     this.duzenlemetarih = map['duzenlemetarih'];
     if (this.duzenlemetarih != "null") {
-      var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(duzenlemetarih));
+      //   var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(duzenlemetarih));
       var yil2 =
           DateFormat.yMMMEd('tr_TR').format(DateTime.parse(duzenlemetarih));
-      this.duzenlemetarih = yil2 + "-" + saat2;
+      this.duzenlemetarih = yil2; //+ "-" + saat2;
     }
     this.miktar = map['miktar'];
 

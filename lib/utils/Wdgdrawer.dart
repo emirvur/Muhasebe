@@ -1,17 +1,19 @@
-import 'package:Muhasebe/models/stokrapor.dart';
-import 'package:Muhasebe/ui/alfatrapor.dart';
-import 'package:Muhasebe/ui/alisfatlist.dart';
-import 'package:Muhasebe/ui/gunceldurum.dart';
-import 'package:Muhasebe/ui/irsaliyelist.dart';
-import 'package:Muhasebe/ui/kasalistesi.dart';
-import 'package:Muhasebe/ui/musteriliste.dart';
-import 'package:Muhasebe/ui/satfatrapor.dart';
-import 'package:Muhasebe/ui/satisfatlist.dart';
-import 'package:Muhasebe/ui/stokgecmisiui.dart';
-import 'package:Muhasebe/ui/stokrapor.dart';
-import 'package:Muhasebe/ui/tedarikcilist.dart';
-import 'package:Muhasebe/ui/urunler_ui.dart';
+import 'package:Muhasebe/screen/alisfatlist.dart';
+import 'package:Muhasebe/screen/irsaliyelist.dart';
+import 'package:Muhasebe/screen/kasalist.dart';
+import 'package:Muhasebe/screen/mustlist.dart';
+import 'package:Muhasebe/screen/satisfatlist.dart';
+import 'package:Muhasebe/screen/stokgecmisui.dart';
+import 'package:Muhasebe/screen/stokrap.dart';
+import 'package:Muhasebe/screen/tedarikcilist.dart';
+import 'package:Muhasebe/screen/urunlist.dart';
+import 'package:Muhasebe/screen/alfatrapor.dart';
+import 'package:Muhasebe/screen/gunceldurum.dart';
+
+import 'package:Muhasebe/screen/satfatrapor.dart';
+
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Wdgdrawer extends StatelessWidget {
   const Wdgdrawer({
@@ -32,49 +34,9 @@ class Wdgdrawer extends StatelessWidget {
               width: double.infinity,
               child: ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.arrowDown,
                   color: Colors.grey,
-                ),
-                title: Text(
-                  "Güncel Durum",
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              ),
-            ),
-            trailing: Icon(
-              Icons.arrow_drop_down,
-              size: 32,
-              color: Colors.grey,
-            ),
-            onExpansionChanged: (value) {
-              //  setState(() {
-              //    isExpand=value;
-              //    });
-            },
-            children: [
-              ListTile(
-                leading: Icon(
-                  Icons.ac_unit_outlined,
-                  color: Colors.grey,
-                ),
-                title: Text(
-                  "Güncel Durum",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                onTap: () {
-                  //  Navigator.of(context).pop();
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Gunceldurum()));
-                },
-              ),
-            ]),
-        ExpansionTile(
-            title: Container(
-              width: double.infinity,
-              child: ListTile(
-                leading: Icon(
-                  Icons.ac_unit_outlined,
-                  color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Satışlar",
@@ -95,8 +57,9 @@ class Wdgdrawer extends StatelessWidget {
             children: [
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.fileAlt,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Faturalar",
@@ -105,13 +68,14 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //   Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Satisfatlist()));
+                      MaterialPageRoute(builder: (context) => Satisfatli()));
                 },
               ),
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.building,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Müşteriler",
@@ -120,13 +84,14 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //    Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Musteriliste()));
+                      MaterialPageRoute(builder: (context) => Musterili()));
                 },
               ),
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.chartBar,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Satış Raporları",
@@ -144,8 +109,9 @@ class Wdgdrawer extends StatelessWidget {
               width: double.infinity,
               child: ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.arrowUp,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Giderler",
@@ -166,8 +132,9 @@ class Wdgdrawer extends StatelessWidget {
             children: [
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.fileAlt,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Gider Listesi",
@@ -176,13 +143,14 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //     Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Alisfatlist()));
+                      MaterialPageRoute(builder: (context) => Alisfatli()));
                 },
               ),
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.truck,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Tedarikçiler",
@@ -191,13 +159,14 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //    Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Tedarikciiste()));
+                      MaterialPageRoute(builder: (context) => Tedarikcili()));
                 },
               ),
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.chartBar,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Giderler Raporu",
@@ -215,8 +184,9 @@ class Wdgdrawer extends StatelessWidget {
               width: double.infinity,
               child: ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.moneyBill,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Nakit",
@@ -237,8 +207,9 @@ class Wdgdrawer extends StatelessWidget {
             children: [
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.university,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Kasa ve Bankalar",
@@ -247,10 +218,10 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => KasaListesiui()));
+                      MaterialPageRoute(builder: (context) => Kasali()));
                 },
               ),
-              ListTile(
+              /*    ListTile(
                 leading: Icon(
                   Icons.ac_unit_outlined,
                   color: Colors.grey,
@@ -259,6 +230,49 @@ class Wdgdrawer extends StatelessWidget {
                   "Raporlar",
                   style: TextStyle(color: Colors.grey),
                 ),
+              ),*/
+            ]),
+        ExpansionTile(
+            title: Container(
+              width: double.infinity,
+              child: ListTile(
+                leading: Icon(
+                  FontAwesomeIcons.receipt,
+                  color: Colors.grey,
+                  size: 18,
+                ),
+                title: Text(
+                  "Güncel Durum",
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+              ),
+            ),
+            trailing: Icon(
+              Icons.arrow_drop_down,
+              size: 32,
+              color: Colors.grey,
+            ),
+            onExpansionChanged: (value) {
+              //  setState(() {
+              //    isExpand=value;
+              //    });
+            },
+            children: [
+              ListTile(
+                leading: Icon(
+                  FontAwesomeIcons.receipt,
+                  color: Colors.grey,
+                  size: 18,
+                ),
+                title: Text(
+                  "Güncel Durum",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                onTap: () {
+                  //  Navigator.of(context).pop();
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Gunceldurum()));
+                },
               ),
             ]),
         ExpansionTile(
@@ -266,8 +280,9 @@ class Wdgdrawer extends StatelessWidget {
               width: double.infinity,
               child: ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.th,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Stok",
@@ -289,8 +304,9 @@ class Wdgdrawer extends StatelessWidget {
             children: [
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.tags,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Hizmet ve Ürünler",
@@ -299,13 +315,14 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //   Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => UrunlerUi()));
+                      MaterialPageRoute(builder: (context) => Urunli()));
                 },
               ),
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.fileAlt,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Irsaliyeler",
@@ -314,13 +331,14 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //   Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Irsaliyelist()));
+                      MaterialPageRoute(builder: (context) => Irsaliyeli()));
                 },
               ),
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.truckMoving,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Stok Geçmişi",
@@ -329,13 +347,14 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //  Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Stokgecmisiui()));
+                      MaterialPageRoute(builder: (context) => Stokgecmisui()));
                 },
               ),
               ListTile(
                 leading: Icon(
-                  Icons.ac_unit_outlined,
+                  FontAwesomeIcons.chartBar,
                   color: Colors.grey,
+                  size: 18,
                 ),
                 title: Text(
                   "Stoktaki Ürünler Raporu",
@@ -344,7 +363,7 @@ class Wdgdrawer extends StatelessWidget {
                 onTap: () {
                   //  Navigator.of(context).pop();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Stokraporui()));
+                      MaterialPageRoute(builder: (context) => Stokrap()));
                 },
               ),
             ]),

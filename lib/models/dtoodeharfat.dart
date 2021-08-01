@@ -21,9 +21,9 @@ class Dtoodeharfat {
     this.odenmistar = map['odenmistar'];
     print(odenmistar.toString());
     if (this.odenmistar != "null") {
-      var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(odenmistar));
+      //   var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(odenmistar));
       var yil2 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(odenmistar));
-      this.odenmistar = yil2 + "-" + saat2;
+      this.odenmistar = yil2; // + "-" + saat2;
     }
     this.kasaid = map['kasaid'];
     this.aciklama = map['aciklama'];

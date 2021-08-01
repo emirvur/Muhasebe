@@ -1,6 +1,6 @@
 class Dtourunhareket {
   int fatid;
-  int barkodno;
+  String barkodno;
   num miktar;
   num brfiyat;
   num vergi;

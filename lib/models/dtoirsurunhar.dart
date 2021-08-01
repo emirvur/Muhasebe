@@ -1,5 +1,5 @@
 class Dtoirsurunhar {
-  int barkodno;
+  String barkodno;
   num miktar;
   num brfiyat;
   num vergi;

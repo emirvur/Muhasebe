@@ -1,5 +1,5 @@
 class Dtourun {
-  int barkodno;
+  String barkodno;
   String adi;
   int kategoriId;
   String katad;

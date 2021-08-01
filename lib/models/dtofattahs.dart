@@ -45,9 +45,9 @@ class Dtofattahs {
     this.cariId = map['cariId'];
     this.cariad = map['cariad'];
     this.duztarih = map['duzenlemetarih'];
-    var saat = DateFormat.jm('tr_TR').format(DateTime.parse(duztarih));
+    //  var saat = DateFormat.jm('tr_TR').format(DateTime.parse(duztarih));
     var yil = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(duztarih));
-    this.duztarih = yil + "-" + saat;
+    this.duztarih = yil; //+ "-" + saat;
     this.fataciklama = map['fatacik'] ?? "null";
     this.katad = map['katad'];
     this.aratop = map['aratop'] ?? -1;
@@ -56,15 +56,15 @@ class Dtofattahs {
     this.geneltoplam = map['geneltop'];
     this.vadta = map['vadta'] ?? "null";
     if (this.vadta != "null") {
-      var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(vadta));
-      var yil1 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(vadta));
-      this.vadta = yil1 + "-" + saat1;
+      //     var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(vadta));
+      /*   var yil1 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(vadta));
+      this.vadta = yil1; // ;*/
     }
     this.alta = map['alta'] ?? "null";
     if (this.alta != "null") {
-      var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(alta));
+      //   var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(alta));
       var yil2 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(alta));
-      this.alta = yil2 + "-" + saat2;
+      this.alta = yil2; //+ "-" + saat2;
     }
     this.alinmism = map['alinmism'];
     this.tahsid = map['tahsid'];

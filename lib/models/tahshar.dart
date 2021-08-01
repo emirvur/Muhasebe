@@ -17,9 +17,9 @@ class Tahshar {
     this.tahsid = map['tahsid'];
     this.tediltar = map['tediltar'] ?? "null";
     if (this.tediltar != "null") {
-      var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(tediltar));
+      // var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(tediltar));
       var yil1 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(tediltar));
-      this.tediltar = yil1 + "-" + saat1;
+      this.tediltar = yil1; // + "-" + saat1;
     }
     this.kasaid = map['kasaid'];
     this.aciklama = map['aciklama'] ?? "null";

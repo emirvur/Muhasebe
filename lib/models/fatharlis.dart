@@ -8,7 +8,7 @@ class Fathareket {
       this.vergi,
       this.toplfiy});
   String ad;
-  int barkodno;
+  String barkodno;
   String birim;
   int miktar;
   num brfiyat;

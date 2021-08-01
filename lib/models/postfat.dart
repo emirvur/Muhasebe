@@ -18,7 +18,7 @@ class Postfatura {
 class Hareket {
   Hareket({this.barkodno, this.miktar, this.brfiyat, this.vergi});
 
-  int barkodno;
+  String barkodno;
   int miktar;
   num brfiyat;
   num vergi;

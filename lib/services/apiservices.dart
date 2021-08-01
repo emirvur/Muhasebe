@@ -16,6 +16,7 @@ import 'package:Muhasebe/models/dtourun.dart';
 import 'package:Muhasebe/models/dtourungecmisi.dart';
 import 'package:Muhasebe/models/dtourunhareket.dart';
 import 'package:Muhasebe/models/fatura.dart';
+import 'package:Muhasebe/models/gunceldurummod.dart';
 import 'package:Muhasebe/models/kasa.dart';
 import 'package:Muhasebe/models/kasahar.dart';
 import 'package:Muhasebe/models/odeput.dart';
@@ -28,33 +29,88 @@ import 'package:Muhasebe/models/urun.dart';
 import 'package:Muhasebe/models/urunhareket.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class APIServices {
 /* 
 todo 1. kullanıcı eklede 500 status codeu duzelt
 */
 
+  static String tok = "1";
   static Map<String, String> header = {
     'Content-type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'Authorization': 'Bearer ${APIServices.tok}'
   };
 
-  static String url =
-      // Platform.isAndroid
-      //? "https://192.168.1.103:45455"
-      //:
-      //  "https://localhost:44311";
-      "https://192.168.1.103:45455";
-  //"https://localhost:44311";
+  /*static Map<String, String> header = {
+    'Content-type': 'application/json',
+    'Accept': 'application/json'
+  };*/
+
+  static String url = "https://localhost:44311";
+
+  //   "https://192.168.1.101:45455";
+
+  static Future tokenal() async {
+    print("token al baslıyr");
+    http.Response res =
+        await http.get("$url/api/calisans/token", headers: header);
+    print(res.statusCode.toString());
+    if (res.statusCode != 200) {
+      print(res.statusCode.toString());
+      throw Exception;
+    }
+    var re = json.decode(res.body);
+    APIServices.tok = re;
+    APIServices.header = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $re'
+    };
+    print(re.toString());
+    print("tokenaall bitii");
+    return re;
+  }
+
+  static Future tokentest() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    var re = sp.getString("token");
+
+    header = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $re'
+    };
+    http.Response res = await http.get("$url/weatherforecast", headers: header);
+    print("yy");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      return -1;
+    } else if (res.statusCode == 200) {
+      print(res.statusCode.toString());
+      return 0;
+    } else {
+      print(res.statusCode.toString());
+      return 1;
+    }
+  }
 
   static Future<bool> urunekle(Urun urun) async {
-    print("girdiii urun ekleye");
     var maps = json.encode(urun.toMap());
     print(maps.toString());
 
     var res = await http.post("$url/api/uruns", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+        urunekle(urun);
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
     if (res.statusCode != 201) {
       throw Exception;
     }
@@ -63,246 +119,301 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
   }
 
   static Future urungenelgecmisial() async {
-    print("urungecmis al baslıyr");
-
-    http.Response res = await http.get("$url/api/urunharekets/g");
-    if (res.statusCode != 200) {
+    print("urungecmis al baslıyor");
+    http.Response res =
+        await http.get("$url/api/urunharekets/g", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+        urungenelgecmisial();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtostokgecmisi> list = [];
     for (var l in re) {
       list.add(Dtostokgecmisi.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future detayirsal(int id) async {
-    print("rsaliye al baslıyr");
+    print("detay irsaliye al baslıyor");
+    http.Response res =
+        await http.get("$url/api/urunharekets/i/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/urunharekets/i/$id");
-    if (res.statusCode != 200) {
+        detayirsal(id);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtoirsurunhar> list = [];
     for (var l in re) {
       list.add(Dtoirsurunhar.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future irsaliyeal() async {
-    print("rsaliye al baslıyr");
+    print("irsaliye al baslıyr");
 
-    http.Response res = await http.get("$url/api/irsaliyes/i");
-    if (res.statusCode != 200) {
+    http.Response res = await http.get("$url/api/irsaliyes/i", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+        irsaliyeal();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtoirsaliye> list = [];
     for (var l in re) {
       list.add(Dtoirsaliye.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
-  static Future tarihliirsaliyeal(String ilktar, String sontar) async {
-    print("rsaliye al baslıyr");
+  static Future tarihliirsaliyeal(int id, String ilktar, String sontar) async {
+    http.Response res = await http.get("$url/api/irsaliyes/$id/$ilktar/$sontar",
+        headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/irsaliyes/$ilktar/$sontar");
-    if (res.statusCode != 200) {
+        tarihliirsaliyeal(id, ilktar, sontar);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtoirsaliye> list = [];
     for (var l in re) {
       list.add(Dtoirsaliye.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
-  static Future urungecmisial(int x) async {
-    print("urungecmis al baslıyr");
+  static Future urungecmisial(String x) async {
+    print("urungecmis al baslıyor");
+    http.Response res =
+        await http.get("$url/api/urunharekets/b/$x", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/urunharekets/b/$x");
-    if (res.statusCode != 200) {
+        urungecmisial(x);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtourungecmisi> list = [];
     for (var l in re) {
       list.add(Dtourungecmisi.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future carisatfatal(int id) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/c/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/c/$id");
-    if (res.statusCode != 200) {
+        carisatfatal(id);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future carialfatal(int id) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/oc/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/oc/$id");
-    if (res.statusCode != 200) {
+        carialfatal(id);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future satfatal() async {
-    print("satfatall al baslıyr");
+    http.Response res = await http.get("$url/api/faturas/lt", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt");
-    if (res.statusCode != 200) {
+        satfatal();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future satfatalacikfat() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/lt/at", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt/at");
-    if (res.statusCode != 200) {
+        satfatalacikfat();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future satfatalkapali() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/lt/kt", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt/kt");
-    if (res.statusCode != 200) {
+        satfatalkapali();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future satfatalvadeac() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/lt/vt/ac", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt/vt/ac");
-    if (res.statusCode != 200) {
+        satfatalvadeac();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future satfatalvadca() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/lt/vt/ca", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt/vt/ca");
-    if (res.statusCode != 200) {
+        satfatalvadca();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
@@ -310,706 +421,948 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
     }
     print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future satfatalduzac() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/lt/dt/ac", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print("rr");
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt/dt/ac");
-    if (res.statusCode != 200) {
+        satfatalduzac();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future satfatalduzca() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/lt/dt/ca", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt/dt/ca");
-    if (res.statusCode != 200) {
+        satfatalduzca();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future satcarifatal(int id) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/lt/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt/$id");
-    if (res.statusCode != 200) {
+        satcarifatal(id);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future satcariacikfatal(int id) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/lt/a/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/lt/a/$id");
-    if (res.statusCode != 200) {
+        satcariacikfatal(id);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future odefatal() async {
-    print("satfatall al baslıyr");
+    http.Response res = await http.get("$url/api/faturas/od", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od");
-    if (res.statusCode != 200) {
+        odefatal();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future odefatalacik() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/od/a", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od/a");
-    if (res.statusCode != 200) {
+        odefatalacik();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future odefatalkapali() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/od/k", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od/k");
-    if (res.statusCode != 200) {
+        odefatalkapali();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future odefatalduzac() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/od/dt/ac", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od/dt/ac");
-    if (res.statusCode != 200) {
+        odefatalduzac();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future odefatalduzca() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/od/dt/ca", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od/dt/ca");
-    if (res.statusCode != 200) {
+        odefatalduzca();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future odefataltedac() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/od/tt/ac", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od/tt/ac");
-    if (res.statusCode != 200) {
+        odefataltedac();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future odefataltedca() async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/od/tt/ca", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od/tt/ca");
-    if (res.statusCode != 200) {
+        odefataltedca();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future odecarifatal(int id) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/od/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od/$id");
-    if (res.statusCode != 200) {
+        odecarifatal(id);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future odecariacikfatal(int id) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/od/a/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/od/a/$id");
-    if (res.statusCode != 200) {
+        odecariacikfatal(id);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future fatuurundetay(int id) async {
-    print("fayurungdd al baslıyr");
+    http.Response res =
+        await http.get("$url/api/urunharekets/f/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/urunharekets/f/$id");
-    if (res.statusCode != 200) {
+        fatuurundetay(id);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtourunhareket> list = [];
     for (var l in re) {
       list.add(Dtourunhareket.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future alfatdetayal(int id) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/o/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/o/$id");
-    if (res.statusCode != 200) {
+        alfatdetayal(id);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     var re = json.decode(res.body);
-    print("ikinci sama");
 
-    print("sorual bitii");
     return Dtofatode.fromMap(re);
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future satfatdetayal(int id) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/t/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/t/$id");
-    if (res.statusCode != 200) {
+        satfatdetayal(id);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     var re = json.decode(res.body);
-    print("ikinci sama");
 
-    print("sorual bitii");
     return Dtofattahs.fromMap(re);
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future raporsatfattaral(DateTime bir, DateTime iki) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/rap/$bir/$iki", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/rap/$bir/$iki");
-    if (res.statusCode != 200) {
+        raporsatfattaral(bir, iki);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     var re = json.decode(res.body);
-    print("ikinci sama");
+
     print(re.toString());
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
 
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future raporalfattaral(DateTime bir, DateTime iki) async {
-    print("satfatall al baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/alrap/$bir/$iki", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/alrap/$bir/$iki");
-    if (res.statusCode != 200) {
+        raporalfattaral(bir, iki);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     var re = json.decode(res.body);
-    print("ikinci sama");
     print(re.toString());
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
 
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future stokraporal() async {
-    print("strap al baslıyr");
+    http.Response res = await http.get("$url/api/uruns/r", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/uruns/r");
-    if (res.statusCode != 200) {
+        stokraporal();
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
-    //  List re = json.decode(res.body);
-    var re = json.decode(res.body);
-    print("ikinci sama");
-    print("$re");
-    //  List<Stokrapor> list = [];
-    //for (var l in re) {
-    //  list.add(Stokrapor.fromMap(l));
-    //}
-    return Stokrapor.fromMap(re);
-    //print("sorual bitii");
-    //  return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    var re = json.decode(res.body);
+
+    print("$re");
+
+    return Stokrapor.fromMap(re);
   }
 
   static Future urunal() async {
-    print("urun al baslıyr");
+    http.Response res = await http.get("$url/api/uruns", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+        APIServices.header = {
+          'Content-type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${APIServices.tok}'
+        };
+        urunal();
 
-    http.Response res = await http.get("$url/api/uruns");
-    if (res.statusCode != 200) {
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtourun> list = [];
     for (var l in re) {
       list.add(Dtourun.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future urunalazdancoga() async {
-    print("urun al baslıyr");
+    http.Response res = await http.get("$url/api/uruns/ac", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/uruns/ac");
-    if (res.statusCode != 200) {
+        urunalazdancoga();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtourun> list = [];
     for (var l in re) {
       list.add(Dtourun.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future urunalcoktanaza() async {
-    print("urun al baslıyr");
+    http.Response res = await http.get("$url/api/uruns/ca", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/uruns/ca");
-    if (res.statusCode != 200) {
+        urunalcoktanaza();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtourun> list = [];
     for (var l in re) {
       list.add(Dtourun.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future kasalistal() async {
-    print("kas al baslıyr");
+    http.Response res = await http.get("$url/api/kasas", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/kasas");
-    if (res.statusCode != 200) {
+        kasalistal();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Kasa> list = [];
     for (var l in re) {
       list.add(Kasa.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future kasahar(int id) async {
-    print("kasahar ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/kasahars/t/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/kasahars/t/$id");
-    if (res.statusCode != 200) {
+        kasahar(id);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtokasahar> list = [];
     for (var l in re) {
       list.add(Dtokasahar.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future tahsharfaticin(int id) async {
-    print("ctahsfssari ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/tahshars/f/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/tahshars/f/$id");
-    if (res.statusCode != 200) {
+        tahsharfaticin(id);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtotahsharfat> list = [];
     for (var l in re) {
       list.add(Dtotahsharfat.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future odeharfaticin(int id) async {
-    print("odeharfaticin ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/odehars/f/$id", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/odehars/f/$id");
-    if (res.statusCode != 200) {
+        odeharfaticin(id);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("testt sama");
+
     print("$re");
     List<Dtoodeharfat> list = [];
     for (var l in re) {
       list.add(Dtoodeharfat.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
+  }
+
+  static Future callstp(DateTime ilk, DateTime son) async {
+    print(header.toString());
+    http.Response res =
+        await http.get("$url/api/calisans/sp/$ilk/$son", headers: header);
+
+    print(header.toString());
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value.toString());
+        APIServices.tok = value;
+        callstp(ilk, son);
+        return;
+      });
+    } else if (res.statusCode != 200) {
+      print(res.statusCode.toString());
+      throw Exception;
+    }
+    List re = json.decode(res.body);
+
+    print("$re");
+    List<Gunceldurummod> list = [];
+    for (var l in re) {
+      list.add(Gunceldurummod.fromMap(l));
+    }
+
+    return list;
+  }
+
+  static Future kasabakiye() async {
+    http.Response res = await http.get("$url/api/kasas/b", headers: header);
+
+    print(header.toString());
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        APIServices.tok = value;
+        kasabakiye();
+        return;
+      });
+    } else if (res.statusCode != 200) {
+      print(res.statusCode.toString());
+      throw Exception;
+    }
+    var re = json.decode(res.body);
+
+    return re;
   }
 
   static Future mustara(String ara) async {
-    print("cari ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/caris/m/$ara", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/m/$ara");
-    if (res.statusCode != 200) {
+        mustara(ara);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Cari> list = [];
     for (var l in re) {
       list.add(Cari.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future tedara(String ara) async {
-    print("cari ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/caris/t/$ara", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/t/$ara");
-    if (res.statusCode != 200) {
+        tedara(ara);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Cari> list = [];
     for (var l in re) {
       list.add(Cari.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future carisatara(int id, String ara) async {
-    print("fat ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/c/$id/$ara", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/c/$id/$ara");
-    if (res.statusCode != 200) {
+        carisatara(id, ara);
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future satfatara(String ara) async {
-    print("fat ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/s/$ara", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/s/$ara");
-    if (res.statusCode != 200) {
+        satfatara(ara);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtofattahs> list = [];
     for (var l in re) {
       list.add(Dtofattahs.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future alisfatara(String ara) async {
-    print("fat ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/a/$ara", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/a/$ara");
-    if (res.statusCode != 200) {
+        alisfatara(ara);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future carialara(int id, String ara) async {
-    print("fat ara baslıyr");
+    http.Response res =
+        await http.get("$url/api/faturas/a/$id/$ara", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/a/$id/$ara");
-    if (res.statusCode != 200) {
+        carialara(id, ara);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
     print("$re");
     List<Dtofatode> list = [];
     for (var l in re) {
       list.add(Dtofatode.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future urunara(String ara) async {
     print("urun ara baslıyr");
 
-    http.Response res = await http.get("$url/api/uruns/a/$ara");
-    if (res.statusCode != 200) {
+    http.Response res =
+        await http.get("$url/api/uruns/a/$ara", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        urunara(ara);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtourun> list = [];
     for (var l in re) {
       list.add(Dtourun.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future<bool> kasaharekle(Kasahar pf) async {
-    print("girdiii fat ekleye");
     var maps = json.encode(pf.toMap());
     print(maps.toString());
 
     var res = await http.post("$url/api/kasahars", headers: header, body: maps);
-    print(res.statusCode.toString());
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        kasaharekle(pf);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
     debugPrint("resten sonra");
     if (res.statusCode != 201) {
       throw Exception;
@@ -1018,32 +1371,98 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
         res.statusCode == 200 || res.statusCode == 201 ? true : false);
   }
 
-  static Future<bool> faturaekle(Postfatura pf) async {
-    print("girdiii fat ekleye");
+  static Future<List<int>> faturaekle(Postfatura pf) async {
     //  var maps = json.encode(pf.toMap());
     var maps = json.encode(pf.toJson());
     print(maps.toString());
 
     var res = await http.post("$url/api/faturas", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print("rr");
+        print(value);
+        APIServices.tok = value;
+
+        faturaekle(pf);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 201) {
       throw Exception;
     }
-    return Future.value(
-        res.statusCode == 200 || res.statusCode == 201 ? true : false);
+    print(res.statusCode.toString());
+    print(res.body);
+    List<int> l;
+    if (json.decode(res.body)['fatTur'] == 1) {
+      print(json.decode(res.body)["tahs"]['tahsid'].toString());
+      l = [
+        json.decode(res.body)['fatid'],
+        json.decode(res.body)["tahs"]['tahsid']
+      ];
+    } else {
+      print(json.decode(res.body)["ode"]['odeid'].toString());
+      l = [
+        json.decode(res.body)['fatid'],
+        json.decode(res.body)["ode"]['odeid']
+      ];
+    }
+
+    return l;
+  }
+
+  static Future getcariris(int cid) async {
+    http.Response res =
+        await http.get("$url/api/irsaliyes/c/$cid", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        getcariris(cid);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
+      print(res.statusCode.toString());
+      throw Exception;
+    }
+    print(res.body.toString());
+    List re = json.decode(res.body);
+    print("ikinci sama");
+    print("$re");
+    List<Dtoirsaliye> list = [];
+    for (var l in re) {
+      list.add(Dtoirsaliye.fromMap(l));
+    }
+
+    return list;
   }
 
   static Future<bool> irsaliyeekle(Postirsaliye pf) async {
-    print("girdiii fat ekleye");
     //  var maps = json.encode(pf.toMap());
     var maps = json.encode(pf.toJson());
     print(maps.toString());
 
     var res =
         await http.post("$url/api/irsaliyes", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        irsaliyeekle(pf);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 200) {
       throw Exception;
     }
@@ -1052,14 +1471,24 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
   }
 
   static Future<bool> urunhareketekle(List<Urunhareket> pf) async {
-    print("girdiii fat ekleye");
     var maps = json.encode(List<dynamic>.from(pf.map((x) => x.toMap())));
     print(maps.toString());
 
     var res =
         await http.post("$url/api/urunharekets", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        urunhareketekle(pf);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 200) {
       throw Exception;
     }
@@ -1068,13 +1497,23 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
   }
 
   static Future<bool> tahsharguncelle(Tahsput pf) async {
-    print("girdiii fat ekleye");
     var maps = json.encode(pf.toMap());
     print(maps.toString());
 
     var res = await http.put("$url/api/tahsilats", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        tahsharguncelle(pf);
+        //.then((value) => value);
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 200) {
       throw Exception;
     }
@@ -1083,7 +1522,6 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
   }
 
   static Future<bool> urharfatidekle(int fid, int irsid) async {
-    print("girdiii fat ekleye");
     var x = Map<String, dynamic>();
     //  map['cariId'] = cariId;
     x['fid'] = fid;
@@ -1093,8 +1531,19 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
 
     var res = await http.put("$url/api/urunharekets/i/$fid/$irsid",
         headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        urharfatidekle(fid, irsid);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 200) {
       throw Exception;
     }
@@ -1102,37 +1551,60 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
         res.statusCode == 200 || res.statusCode == 201 ? true : false);
   }
 
-  static Future<int> irsifatyap(int id, String ilkt, String sont) async {
-    print("girdiii fat ekleye");
+  static Future<List<int>> irsifatyap(int id) async {
     var x = Map<String, dynamic>();
     //  map['cariId'] = cariId;
     x['id'] = id;
     var maps = json.encode(x);
     print(maps.toString());
 
-    var res = await http.put("$url/api/irsaliyes/$id/$ilkt/$sont",
-        headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    var res =
+        await http.put("$url/api/irsaliyes/$id", headers: header, body: maps);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print("rr");
+        print(value);
+        APIServices.tok = value;
+
+        irsifatyap(id);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 200) {
       throw Exception;
     }
+    print("qq");
+    print(json.decode(res.body)['fatid'].toString());
     print(res.body.toString());
-    print("fff");
-
-    return Future.value(res.statusCode == 200 || res.statusCode == 201
-        ? 1 //int.tryParse(res.body)
-        : -1);
+    List<int> l = [
+      json.decode(res.body)['fatid'],
+      json.decode(res.body)["tahs"]['tahsid']
+    ];
+    return l;
   }
 
   static Future<bool> odeharguncelle(Odeput pf) async {
-    print("girdiii fat ekleye");
     var maps = json.encode(pf.toMap());
     print(maps.toString());
 
     var res = await http.put("$url/api/odemelers", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        odeharguncelle(pf);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 200) {
       throw Exception;
     }
@@ -1141,13 +1613,23 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
   }
 
   static Future<bool> kasaekle(Kasa kasa) async {
-    print("girdiii kasa ekleye");
     var maps = json.encode(kasa.toMap());
     print(maps.toString());
 
     var res = await http.post("$url/api/kasas", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        kasaekle(kasa);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 201) {
       throw Exception;
     }
@@ -1156,13 +1638,23 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
   }
 
   static Future<bool> musteriekle(Cari kasa) async {
-    print("girdiii kasa ekleye");
     var maps = json.encode(kasa.toMap(1));
     print(maps.toString());
 
     var res = await http.post("$url/api/caris", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        musteriekle(kasa);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 201) {
       throw Exception;
     }
@@ -1171,13 +1663,23 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
   }
 
   static Future<bool> tedarekl(Cari kasa) async {
-    print("girdiii kasa ekleye");
     var maps = json.encode(kasa.toMap(2));
     print(maps.toString());
 
     var res = await http.post("$url/api/caris", headers: header, body: maps);
-    print(res.statusCode.toString());
-    debugPrint("resten sonra");
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
+
+        tedarekl(kasa);
+
+        return;
+      });
+    } else
+      print(res.statusCode.toString());
+
     if (res.statusCode != 201) {
       throw Exception;
     }
@@ -1186,237 +1688,334 @@ todo 1. kullanıcı eklede 500 status codeu duzelt
   }
 
   static Future gunceldurumal() async {
-    print("musteri al baslıyr");
+    http.Response res = await http.get("$url/api/faturas/gd", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/faturas/gd");
-    if (res.statusCode != 200) {
+        gunceldurumal();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     var re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtogunceldurum> list = [];
     for (var l in re) {
       list.add(Dtogunceldurum.fromMap(l));
     }
 
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
-  static Future stokdetayfatsatis(int x) async {
-    print("musteri al baslıyr");
+  static Future stokdetayfatsatis(String x) async {
+    http.Response res =
+        await http.get("$url/api/urunharekets/st/$x", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/urunharekets/st/$x");
-    if (res.statusCode != 200) {
+        stokdetayfatsatis(x);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     var re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtostokdetay> list = [];
     for (var l in re) {
       list.add(Dtostokdetay.fromMap(l));
     }
 
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
-  static Future stokdetayfatalis(int x) async {
-    print("musteri al baslıyr");
+  static Future stokdetayfatalis(String x) async {
+    http.Response res =
+        await http.get("$url/api/urunharekets/al/$x", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/urunharekets/al/$x");
-    if (res.statusCode != 200) {
+        stokdetayfatalis(x);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     var re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtostokdetay> list = [];
     for (var l in re) {
       list.add(Dtostokdetay.fromMap(l));
     }
 
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future safcarial(int x) async {
-    print("musteri al baslıyr");
+    http.Response res = await http.get("$url/api/caris/$x", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/$x");
-    if (res.statusCode != 200) {
+        safcarial(x);
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     var re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     /*  List<Cari> list = [];
     for (var l in re) {
       list.add(Cari.fromMap(l));
     }*/
     Cari ca = Cari.fromMap(re);
-    print("sorual bitii");
-    return ca;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return ca;
   }
 
-  static Future msuterial() async {
-    print("musteri al baslıyr");
+  static Future musterial() async {
+    http.Response res = await http.get("$url/api/caris/m", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/m");
-    if (res.statusCode != 200) {
+        musterial();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtocarilist> list = [];
     for (var l in re) {
       list.add(Dtocarilist.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future msuterialca() async {
-    print("musteri al baslıyr");
+    http.Response res = await http.get("$url/api/caris/m/ca", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/m/ca");
-    if (res.statusCode != 200) {
+        msuterialca();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtocarilist> list = [];
     for (var l in re) {
       list.add(Dtocarilist.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future msuterialac() async {
-    print("musteri al baslıyr");
+    http.Response res = await http.get("$url/api/caris/m/ac", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/m/ac");
-    if (res.statusCode != 200) {
+        msuterialac();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtocarilist> list = [];
     for (var l in re) {
       list.add(Dtocarilist.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future tedaral() async {
-    print("musteri al baslıyr");
+    http.Response res = await http.get("$url/api/caris/t", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/t");
-    if (res.statusCode != 200) {
+        tedaral();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtocarilist> list = [];
     for (var l in re) {
       list.add(Dtocarilist.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future tedaralca() async {
-    print("musteri al baslıyr");
+    http.Response res = await http.get("$url/api/caris/t/ca", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/t/ca");
-    if (res.statusCode != 200) {
+        tedaralca();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtocarilist> list = [];
     for (var l in re) {
       list.add(Dtocarilist.fromMap(l));
     }
-    print("sorual bitii");
     return list;
-
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
 
   static Future tedaralac() async {
-    print("musteri al baslıyr");
+    http.Response res = await http.get("$url/api/caris/t/ac", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/caris/t/ac");
-    if (res.statusCode != 200) {
+        tedaralac();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Dtocarilist> list = [];
     for (var l in re) {
       list.add(Dtocarilist.fromMap(l));
     }
-    print("sorual bitii");
-    return list;
 
-    // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
+    return list;
   }
 
   static Future kasaal() async {
-    print("kasa al baslıyr");
+    http.Response res = await http.get("$url/api/kasas", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print(value);
+        APIServices.tok = value;
 
-    http.Response res = await http.get("$url/api/kasas");
-    if (res.statusCode != 200) {
+        kasaal();
+
+        return;
+      });
+    } else if (res.statusCode != 200) {
       print(res.statusCode.toString());
       throw Exception;
     }
     List re = json.decode(res.body);
-    print("ikinci sama");
+
     print("$re");
     List<Kasa> list = [];
     for (var l in re) {
       list.add(Kasa.fromMap(l));
     }
-    print("sorual bitii");
+
     return list;
+  }
+}
+
+  /*static Future getvt(String ad, String sifre) async {
+    http.Response res =
+        await http.get("$url/api/calisans/b/$ad/$sifre", headers: header);
+    if (res.statusCode == 401) {
+      print(res.statusCode.toString());
+      tokenal().then((value) {
+        print("rr");
+        print(value);
+        APIServices.tok = value;
+
+        getvt(ad, sifre);
+        //.then((value) => value);
+        return;
+      });
+    } else if (res.statusCode != 200) {
+      print(res.statusCode.toString());
+      throw Exception;
+    }
+    List re = json.decode(res.body);
+    print("ikinci sama");
+    print("$re" ?? "null");
+    re == null ? print("aaa") : print("sss");
+
+    /*List<Dtostokgecmisi> list = [];
+    for (var l in re) {
+      list.add(Dtostokgecmisi.fromMap(l));
+    }
+    print("sorual bitii");*/
+    return re.length == 0 ? -1 : 0; //list;
 
     // return List<Kullaniciliste>.from(re.map((x) => Kullaniciliste.fromMap(x)));
   }
-}
+*/

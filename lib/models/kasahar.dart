@@ -13,7 +13,7 @@ class Kasahar {
 
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
-
+    print("qwwe");
     map['kasaid'] = kasaid;
     map['thid'] = thid;
     map['ohid'] = ohid;
@@ -21,7 +21,7 @@ class Kasahar {
     map['durum'] = durum;
     map['miktar'] = miktar;
     map['miktaraciklamasi'] = miktaraciklamasi;
-
+    print("dwadsa");
     return map;
   }
 

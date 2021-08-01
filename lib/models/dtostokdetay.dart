@@ -1,6 +1,6 @@
 class Dtostokdetay {
   int fatid;
-  int barkodno;
+  String barkodno;
   num miktar;
   num brfiyat;
   num vergi;

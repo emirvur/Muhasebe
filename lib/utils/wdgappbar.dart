@@ -1,4 +1,6 @@
+import 'package:Muhasebe/screen/loginui.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Wdgappbar extends StatelessWidget {
   final String ilk;
@@ -47,12 +49,22 @@ class Wdgappbar extends StatelessWidget {
             SizedBox(
               width: 5,
             ),
-            CircleAvatar(
-              radius: 15,
-              backgroundColor: Colors.tealAccent,
-              child: Icon(
-                Icons.person,
-                color: Color(0xffCCCCCC),
+            InkWell(
+              onTap: () async {
+                SharedPreferences sp = await SharedPreferences.getInstance();
+                var islog = sp.setBool("islogin", false);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => Loginui()),
+                    (Route<dynamic> route) => false);
+              },
+              child: CircleAvatar(
+                radius: 15,
+                backgroundColor: Colors.tealAccent,
+                child: Icon(
+                  Icons.person,
+                  color: Color(0xffCCCCCC),
+                ),
               ),
             ),
           ],

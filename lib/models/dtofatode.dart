@@ -44,12 +44,12 @@ class Dtofatode {
     this.cariId = map['cariId'];
     this.cariad = map['cariad'];
     this.duztarih = map['duzenlemetarih'];
-    print("11deed");
-    var saat = DateFormat.jm('tr_TR').format(DateTime.parse(duztarih));
+
+    //  var saat = DateFormat.jm('tr_TR').format(DateTime.parse(duztarih));
     var yil = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(duztarih));
-    print("2de");
-    this.duztarih = yil + "-" + saat;
-    print("3te");
+
+    this.duztarih = yil; //+ "-" + saat;
+
     this.fataciklama = map['fatacik'] ?? "null";
     this.katad = map['katad'];
     this.aratop = map['aratop'] ?? -1;
@@ -58,16 +58,16 @@ class Dtofatode {
     this.geneltoplam = map['geneltop'];
     this.odenecektar = map['odenecektar'] ?? "null";
     if (this.odenecektar != "null") {
-      var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(odenecektar));
-      var yil1 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(odenecektar));
-      this.odenecektar = yil1 + "-" + saat1;
+      //  var saat1 = DateFormat.jm('tr_TR').format(DateTime.parse(odenecektar));
+      /* var yil1 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(odenecektar));
+      this.odenecektar = yil1; */
     }
-    print("5tee");
+
     this.odenmistar = map['odenmistar'] ?? "null";
     if (this.odenmistar != "null") {
-      var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(odenmistar));
+      // var saat2 = DateFormat.jm('tr_TR').format(DateTime.parse(odenmistar));
       var yil2 = DateFormat.yMMMEd('tr_TR').format(DateTime.parse(odenmistar));
-      this.odenmistar = yil2 + "-" + saat2;
+      this.odenmistar = yil2; // + "-" + saat2;
     }
 
     this.odendimik = map['odendimik'] ?? 0;
