@@ -2,6 +2,10 @@
 
 Bu uygulama ön muhasebe programının temel modüllerini içerir.Paraşüt uygulamasının klonudur.Eğitim amaçlı yapılmıştır.Hiçbir şekilde ticari amaç için kullanılamaz.
 
+- Bu uygulamanın demo videosuna erişmek için https://www.youtube.com/watch?v=5-wpfItP30s
+- Bu uygulamanın front-end kodlarına erişmek için https://github.com/emirvur/parasut_web_muhasebe_clone_frontend
+- Back-end kodlarına erişmek için https://github.com/emirvur/parasut_web_muhasebe_clone_backend
+
 #Özellikler
 
 - [x] Satış Modülü
@@ -12,3 +16,8 @@ Bu uygulama ön muhasebe programının temel modüllerini içerir.Paraşüt uygu
 - [x] Rapor mail gönderme
 - [] Çek-Senet Modülü
 - [] E-Fatura Entegrasyonu
+
+<img src="screenshots/urunler.png"  width="400" height="600">
+<img src="screenshots/urundetay.png"  width="400" height="600">
+<img src="screenshots/faturadetayweb.png"  width="400" height="600">
+<img src="screenshots/yenifatura.png"  width="400" height="600">
