@@ -17,7 +17,7 @@ Bu uygulama ön muhasebe programının temel modüllerini içerir.Paraşüt uygu
 - [] Çek-Senet Modülü
 - [] E-Fatura Entegrasyonu
 
-<img src="screenshots/urunler.png"  width="400" height="600">
-<img src="screenshots/urundetay.png"  width="400" height="600">
-<img src="screenshots/faturadetayweb.png"  width="400" height="600">
-<img src="screenshots/yenifatura.png"  width="400" height="600">
+<img src="screenshots/urunler.png"  width="750" height="500">
+<img src="screenshots/urundetay.png"  width="750" height="500">
+<img src="screenshots/faturadetayweb.png"  width="750" height="500">
+<img src="screenshots/yenifatura.png"  width="750" height="500">
