@@ -6,7 +6,7 @@ Bu uygulama ön muhasebe programının temel modüllerini içerir.Paraşüt uygu
 - Bu uygulamanın front-end kodlarına erişmek için https://github.com/emirvur/parasut_web_muhasebe_clone_frontend
 - Back-end kodlarına erişmek için https://github.com/emirvur/parasut_web_muhasebe_clone_backend
 
-#Özellikler
+## Özellikler
 
 - [x] Satış Modülü
 - [x] Gider Modülü
